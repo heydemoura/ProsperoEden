@@ -1,0 +1,75 @@
+name: "Tested settings report"
+description: "Submit a repeatable game/settings test for the compatibility list"
+title: "[Settings report] "
+labels: ["compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reports are reviewed before becoming presets. A working report is not automatically a recommendation.
+        The in-app QR link snapshots current settings, not proof of what ran. Check them against your test.
+        Do not attach games, keys, firmware, shader caches, private accounts or Sony SDK files.
+  - type: input
+    id: game
+    attributes:
+      label: "Game name, title ID, region and update version"
+    validations:
+      required: true
+  - type: input
+    id: eden
+    attributes:
+      label: "ProsperoEden version"
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: "PS5 model, firmware, enabler and ShadowMountPlus versions"
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: "Settings actually tested"
+      description: "Check this snapshot, including output resolution and logging options. Include mods/patches if any."
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: scene
+    attributes:
+      label: "Repeatable scene and test duration"
+      description: "Name the board, level or minigame and how to reach it. Repeat it after warming the shader cache."
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: "Result"
+      options:
+        - "Works with correct graphics"
+        - "Runs with graphics problems"
+        - "Runs slowly or stutters"
+        - "Crashes or freezes"
+        - "Does not launch"
+    validations:
+      required: true
+  - type: textarea
+    id: observations
+    attributes:
+      label: "Performance, graphics, sound and known problems"
+      description: "Include native FPS range, pauses, visual correctness and whether restarting changes the result. Do not count generated frames as native FPS."
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: "Optional evidence"
+      description: "Attach a short capture or reviewed/redacted logs. Do not attach your entire config or game files."
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: "Confirmation"
+      options:
+        - label: "I personally tested these settings and checked the report before submitting."
+          required: true
