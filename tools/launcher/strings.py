@@ -34,7 +34,7 @@ CATALOGS = LAUNCHER / "ui/lang"
 TEMPLATE = ROOT / "tools/launcher/launcher.pot"
 FONT = LAUNCHER / "ui/fonts/montserrat-medium.pefont"
 SETTINGS = ROOT / "headless/settings_store.h"
-SETTING_LABELS = ("kResolutionLabels", "kUpscalingFilterLabels", "kLanguageLabels")
+SETTING_LABELS = ("kResolutionLabels", "kUpscalingFilterLabels", "kAstcTextureLabels", "kLanguageLabels")
 
 LITERALS = r'((?:"(?:[^"\\]|\\.)*"\s*)+)'
 MARKED = re.compile(r"\b(?:tr|TR)\(\s*" + LITERALS)
@@ -57,6 +57,10 @@ NOTES = {
     "What's new": "Button on the update dialog: opens the new release's notes (what changes in it). Keep it short.",
     "What's new in version {0}": "Title of the release notes view; {0} is the new version, for example 1.000.080.",
     "Scroll": "Button hint: move through a long text (Up/Down).",
+    "Update notices": "Settings switch: whether the app says at its start that a newer release of this app is listed (not game updates).",
+    "Says when homebrew.page has a newer version. Off, only About names it.": "About the Update notices switch; homebrew.page is a site's name and stays as it is; About is the menu's last section (use its translation).",
+    "Speed limit": "Settings > Performance: how fast a game may run, as a percentage of the console it was made for.",
+    "Unlimited": "A Speed limit choice: no limit at all (as fast as the console can).",
     "The rest is on the app's page on homebrew.page.": "Shown at the end of release notes that were cut short; homebrew.page is a site's name and stays as it is.",
     "Select": "Button hint: choose the highlighted item (not the Select button).",
     "Back": "Button hint: go back one screen.",
@@ -74,6 +78,8 @@ NOTES = {
     "Handheld": "Console mode: the console as if held in the hands.",
     "{0} OF {1}": "Position in a list: 3 OF 12.",
     "Off": "A setting that is switched off.",
+    "Cheats folder": "Shown under a cheat that came from the game's cheats folder (not from a mod).",
+    "No cheats for this game yet. Copy its cheat files (<build ID>.txt) to {0}.": "<build ID>.txt stays as it is: a cheat file is named after the game version's build ID. {0} is a folder such as roms/Game/cheats/.",
     "On": "A setting that is switched on.",
     "None": "No add-ons (updates or DLC).",
     "Default ({0})": "A per-game setting that follows the general setting; {0} is its value.",
@@ -82,7 +88,6 @@ NOTES = {
     "STARTING": "Shown over a game's cover while it starts.",
     "Make it yours.": "Headline of the Settings screen.",
     "Your next adventure": "Headline when no game has been played yet.",
-    "PS5 EDITION  /  {0}": "{0} is the version, for example v1.000.030.",
     "{0}/ (NSP or XCI)": "{0} is a folder; NSP and XCI are file types.",
     "Docked": "Console mode: the console as if connected to a TV. Keep it short (about 9 letters).",
     "Handheld": "Console mode: the console as if held in the hands. Keep it short (about 9 letters).",
@@ -102,6 +107,15 @@ NOTES = {
     "Nearest": "An upscaling filter (nearest neighbour). Keep it short.",
     "Bilinear": "An upscaling filter.",
     "Bicubic": "An upscaling filter.",
+    "ASTC textures": "Setting: how a game's textures in the ASTC format are held in graphics memory. ASTC "
+                     "is a format's name (unchanged).",
+    "ASTC TEXTURES": "Label: see 'ASTC textures'.",
+    "Compressed": "A choice of 'ASTC textures': the textures are kept compressed (less memory). Keep it short.",
+    "Full quality": "A choice of 'ASTC textures': the textures are kept uncompressed (more memory). Keep it "
+                    "short.",
+    "Saved. Full quality uses four times the graphics memory for these textures and can run out above 1x.":
+        "Shown after choosing 'Full quality' for 'ASTC textures'. 1x is a resolution scale (unchanged). "
+        "It has two lines: keep it short.",
     "Vulkan (recommended)": "Vulkan is a name (unchanged).",
     "Game could not start: {0} Details: {1}": "{0} is the reason, a sentence in English; {1} is a file.",
     "Mods": "Changes to a game that the player added: patches, replaced files, cheats. Keep the word "
@@ -209,6 +223,13 @@ NOTES = {
     "The game ran out of graphics memory. Lower the resolution in Settings, Video (or in the game's own settings) "
     "and start it again.": "Why a game stopped. 'Settings, Video' is the menu path; 'the game's own settings' is the "
                            "Game settings dialog of the Library.",
+    "Play": "Button and button hint: start the game shown. Keep it to one short word.",
+    "Sections": "Button hint beside L1 and R1: they move between the menu's sections (Home, Library, Multiplayer, Settings, About).",
+    "Home": "The menu's first section, its opening screen (not a house, and not the PS5's own home screen).",
+    "Theme": "A tile of Settings and its dialog's title: the look of this menu (its colours and artwork).",
+    "The look of this menu.": "Under the title Theme: what a theme changes.",
+    "Tropical dusk, dark green glass and lime.": "One line about the theme named Canopy: its artwork is a tropical sunset, its panels are dark green glass, its accent colour is lime green.",
+    "About": "The menu's last section: about this app (its credits, where its files go). One short word.",
 }
 
 

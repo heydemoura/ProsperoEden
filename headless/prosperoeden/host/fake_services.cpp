@@ -8,7 +8,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cctype>
 #include <cstdio>
+#include <filesystem>
 
 namespace pe::host
 {
@@ -33,7 +35,7 @@ struct Sample
 
 // Invented titles: nothing here names a real game.
 constexpr Sample kSamples[] = {
-    {"Starfall Odyssey", "NSP", "6.4 GB", "1.2.0", 2, "English (US)", "", 0x1b2a6b, 0x40b3c8, 0xffd166},
+    {"Starfall Odyssey", "NSP", "6.4 GB", "1.2.0", 2, "English (US)", "", 0x1b2a6b, 0x40b3c8, 0xffd166, true},
     {"Moss & Lantern", "XCI", "2.1 GB", "", 0, "English (US)", "", 0x16402f, 0x7bc86c, 0xf4e285},
     {"Kart Carnival Deluxe", "NSP", "7.8 GB", "3.0.1", 48, "English (US)", "", 0xb3261e, 0xffb238, 0xffffff},
     {"Tiny Harbor", "NSP", "512.0 MB", "", 0, "English (US)", "", 0x256d8f, 0x9bd8e6, 0xfff3d6},
@@ -42,7 +44,7 @@ constexpr Sample kSamples[] = {
     {"Pocket Rally Turbo", "NSP", "1.9 GB", "", 0, "English (US)", "", 0x202020, 0xe85d04, 0xf8f9fa},
     {"Cloudline", "NSP", "3.3 GB", "", 1, "English (US)", "", 0x5fa8d3, 0xcae9ff, 0x1b4965},
     {"Ember Knights II", "XCI", "9.6 GB", "2.4.0", 5, "English (US)", "", 0x3d0c02, 0xd62828, 0xfcbf49},
-    {"Paper Garden", "NSP", "840.5 MB", "", 0, "English (US)", "", 0xf1e3c6, 0x90be6d, 0x386641},
+    {"Paper Garden and the Clockwork Orchard", "NSP", "840.5 MB", "", 0, "English (US)", "", 0xf1e3c6, 0x90be6d, 0x386641},
     {"Neon Drifters", "NSP", "5.2 GB", "1.0.3", 0, "English (US)", "", 0x10002b, 0x7b2cbf, 0x5ef2ff},
     {"Caf\xC3\xA9 Nocturne", "NSP", "2.7 GB", "", 0, "French", "", 0x2b1d0e, 0xa9713c, 0xf6e7cb},
     {"Sky Shepherds", "XCI", "4.4 GB", "", 3, "English (US)", "", 0x457b9d, 0xa8dadc, 0xf1faee, true},
@@ -127,6 +129,7 @@ constexpr const char *kResolutionLabels[] = {"0.5x (faster, softer)", "0.75x (fa
                                              "3x (slower)", "4x (slowest)"};
 const std::vector<std::string> kResolutionKeys = {"0.5x", "0.75x", "1x", "1.5x", "2x", "3x", "4x"};
 constexpr const char *kFilterLabels[] = {"Bilinear", "AMD FSR", "Bicubic", "Nearest"};
+constexpr const char *kAstcLabels[] = {"Compressed", "Full quality"};
 constexpr const char *kLanguageLabels[] = {
     "English (US)", "English (UK)", "French", "French (Canada)", "German", "Italian", "Spanish",
     "Spanish (Latin America)", "Portuguese", "Portuguese (Brazil)", "Dutch", "Russian", "Polish",
@@ -145,6 +148,7 @@ constexpr int kLanguageRegions[] = {1, 2, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 0, 5,
 
 FakeServices::FakeServices(const std::string &covers_directory)
 {
+    wallpapers_directory_ = covers_directory + "/wallpapers";
     int index = 0;
     for (const Sample &sample : kSamples)
     {
@@ -198,6 +202,18 @@ FakeServices::FakeServices(const std::string &covers_directory)
             game.cover.clear();
         remote_.push_back(game);
     }
+    // Runtime preview: exercise the complete scrolling library without shipping game payloads.
+    for(int extra=static_cast<int>(games_.size());extra<64;++extra) {
+        ui::Game game=games_[static_cast<std::size_t>(extra)%games_.size()];
+        game.name="Sample Software "+std::to_string(extra+1); game.file=game.name+".nsp";
+        // A copy of a game with the sample mods has them too: the game the preview's Library
+        // settles on is one.
+        const bool modded = std::find(modded_.begin(), modded_.end(), game.title_id) != modded_.end();
+        game.title_id=0x0100C00000000000ull+static_cast<std::uint64_t>(extra);
+        if (modded)
+            modded_.push_back(game.title_id);
+        games_.push_back(std::move(game));
+    }
     std::sort(games_.begin(), games_.end(),
               [](const ui::Game &a, const ui::Game &b) { return a.name < b.name; });
 }
@@ -234,7 +250,8 @@ ui::Home FakeServices::home()
         };
         // As the console does: a game taken away is not offered, the next recent one is.
         const char *const recent[] = {"Echoes of the Valley", "Kart Carnival Deluxe", "Starfall Odyssey",
-                                      "Caf\xC3\xA9 Nocturne"};
+                                      "Caf\xC3\xA9 Nocturne", "Neon Drifters", "Pocket Rally Turbo",
+                                      "Cloudline", "Ember Knights II"};
         const char *first = recent[0];
         for (const char *name : recent)
             if (game_exists(find(name).file))
@@ -291,6 +308,18 @@ const std::vector<std::string> &FakeServices::filter_labels()
     static const std::vector<std::string> labels = translated(kFilterLabels);
     return labels;
 }
+const std::vector<std::string> &FakeServices::astc_labels()
+{
+    static const std::vector<std::string> labels = translated(kAstcLabels);
+    return labels;
+}
+// The bundled presets the preview shows, as a console with no presets of its own lists them.
+const std::vector<std::string> &FakeServices::post_processing_labels()
+{
+    static const std::vector<std::string> labels = {
+        tr("Off"), "Anime", "Cinematic", "Clean", "Dreamy", "Retro", "Vivid"};
+    return labels;
+}
 const std::vector<std::string> &FakeServices::language_labels()
 {
     static const std::vector<std::string> labels = translated(kLanguageLabels);
@@ -310,6 +339,26 @@ std::string FakeServices::setup_details()
                tr("Keys and firmware: startup checks passed. Game-specific compatibility is checked at "
                   "launch.") :
                fill(tr("Missing or empty keys/prod.keys in {0}."), {"/data/prosperoeden"});
+}
+
+std::vector<std::string> FakeServices::wallpapers()
+{
+    std::vector<std::string> names;
+    std::error_code error;
+    for (std::filesystem::directory_iterator it{wallpapers_directory_, error}, end; !error && it != end;
+         it.increment(error))
+        if (it->is_regular_file())
+            names.push_back(it->path().filename().string());
+    // Sorted without regard to case, as the console lists a folder (eden_services.cpp).
+    const auto lower = [](std::string text)
+    {
+        for (char &c : text)
+            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        return text;
+    };
+    std::sort(names.begin(), names.end(),
+              [&](const std::string &a, const std::string &b) { return lower(a) < lower(b); });
+    return names;
 }
 
 bool FakeServices::folders(const std::string &directory, std::vector<std::string> *names)
@@ -336,20 +385,45 @@ std::vector<ui::Mod> FakeServices::mods(std::uint64_t title_id)
         return {};
     std::vector<ui::Mod> mods = {
         {"60 FPS", tr("Patch"), true, {}},
+        {"Cheats folder", tr("Cheats"), true, {}, true},
         {"Sharper textures", tr("Files"), true, {}},
         {"Starter pack", std::string(tr("Files")) + ", " + tr("Cheats"), true, {}},
+        {"cheat_lives.txt", tr("Cheats"), true, {}, true},
     };
     for (ui::Mod &mod : mods)
         mod.enabled = std::find(mods_off_.begin(), mods_off_.end(), mod.name) == mods_off_.end();
     for (const char *cheat : {"60 FPS", "30 FPS", "Infinite health", "All items", "Moon jump"})
-        mods.back().cheats.push_back(
+        mods[1].cheats.push_back(
             {cheat, std::find(cheats_on_.begin(), cheats_on_.end(), cheat) != cheats_on_.end()});
     return mods;
 }
 
-bool FakeServices::set_cheat_enabled(std::uint64_t, const std::string &, const std::string &cheat,
+std::vector<ui::GameCheat> FakeServices::cheats(std::uint64_t title_id)
+{
+    std::vector<ui::GameCheat> cheats;
+    for (const ui::Mod &mod : mods(title_id))
+    {
+        for (const ui::Cheat &cheat : mod.cheats)
+            cheats.push_back({mod.name, cheat.name, cheat.enabled});
+        if (mod.name == "Starter pack")
+            cheats.push_back({mod.name, "Bonus outfit", bonus_cheat_});
+        if (mod.name == "cheat_lives.txt")
+            cheats.push_back({mod.name, "Infinite lives", mod.enabled});
+    }
+    return cheats;
+}
+
+bool FakeServices::set_cheat_enabled(std::uint64_t title_id, const std::string &mod, const std::string &cheat,
                                      bool enabled)
 {
+    // The cheats of mods with one: as EdenServices keeps them.
+    if (mod == "Starter pack")
+    {
+        bonus_cheat_ = enabled;
+        return true;
+    }
+    if (mod == "cheat_lives.txt")
+        return set_mod_enabled(title_id, mod, enabled);
     const auto drop = [this](const std::string &name)
     { cheats_on_.erase(std::remove(cheats_on_.begin(), cheats_on_.end(), name), cheats_on_.end()); };
     drop(cheat);

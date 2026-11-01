@@ -11,7 +11,10 @@ cache = Path((root / '.local/headless-cache').read_text().strip())
 source = cache / 'source/src'
 original = (source / 'common/thread.cpp').read_text()
 derived = (cache / 'native-local/headless/thread.cpp').read_text()
-assert derived == '#include "' + str(root / 'headless/performance.h') + '"\n' + original.replace(
+# The include names the port folder as the build was configured (a symlinked checkout differs).
+include, derived = derived.split('\n', 1)
+assert include.startswith('#include "') and Path(include[10:-1]).resolve() == root / 'headless/performance.h', include
+assert derived == original.replace(
     'void SetCurrentThreadName(const char* name) {',
     'void SetCurrentThreadName(const char* name) {\n    ::Eden::Performance::RegisterWorker(name);')
 main = (root / 'headless/main.cpp').read_text()
@@ -46,10 +49,16 @@ extern "C" void ps5_opengl_heap_snapshot(const char*, unsigned) {}
 namespace Eden::Fastmem {
 Stats WindowStats() noexcept { return {}; }
 std::uint64_t Faults() noexcept { return 0; }
+std::uint64_t Demotions() noexcept { return 0; }
 }
 int main() {
     using namespace Eden::Performance;
     PlatformChecks();
+    // A Timer counts only while timers are on (development builds and cost runs).
+    Totals untimed;
+    for (unsigned i = 0; i < 1000; ++i) { Timer timer(untimed, 16); }
+    assert(untimed.calls == 0 && untimed.requested_bytes == 0 && untimed.nanoseconds == 0);
+    timers_on = true;
     Totals timed;
     for (unsigned i = 0; i < 1000; ++i) { Timer timer(timed, 16); }
     assert(timed.calls == 1000 && timed.requested_bytes == 16000 && timed.nanoseconds > 0);

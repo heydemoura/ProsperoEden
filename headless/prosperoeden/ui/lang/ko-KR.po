@@ -43,7 +43,12 @@ msgstr "펌웨어 NCA를 읽을 수 없습니다. 펌웨어를 다시 설치하�
 msgid "A pairing is running already."
 msgstr "이미 페어링이 진행 중입니다."
 
-#: pe/ui/home.cpp
+#: pe/ui/browse.cpp
+msgid "ABOUT"
+msgstr "정보"
+
+#. The menu's last section: about this app (its credits, where its files go). One short word.
+#: pe/ui/shell.cpp
 msgid "About"
 msgstr "정보"
 
@@ -61,6 +66,10 @@ msgstr "약 {0}분 남음"
 msgid "About {0} s left"
 msgstr "약 {0}초 남음"
 
+#: pe/ui/settings.cpp
+msgid "Above 100%, a game locked to 30 FPS can reach 60, and a game that counts its frames plays faster too."
+msgstr "100%를 넘으면 30 FPS로 고정된 게임이 60에 이를 수 있고, 프레임 수로 시간을 세는 게임은 진행도 빨라집니다."
+
 #. Label: which folders the app can read.
 #: pe/ui/browse.cpp
 msgid "ACCESS"
@@ -71,23 +80,9 @@ msgstr "접근 권한"
 msgid "Accessibility"
 msgstr "접근성"
 
-#: pe/ui/settings.cpp
-msgid "ACCESSIBILITY"
-msgstr "접근성"
-
 #: pe/ui/profiles.cpp
 msgid "Add"
 msgstr "추가"
-
-#. Label: a game's updates, DLC and mods.
-#: pe/ui/library.cpp
-msgid "ADD-ONS"
-msgstr "추가 콘텐츠"
-
-#. {0}: updates, DLC and mods of the game; {1}: the language it will use.
-#: pe/ui/home.cpp
-msgid "Add-ons: {0}  /  Language: {1}"
-msgstr "추가 콘텐츠: {0}  /  언어: {1}"
 
 #: pe/ui/remote.cpp
 msgid "Added to the downloads. Settings, Downloads shows the queue."
@@ -97,9 +92,9 @@ msgstr "다운로드에 추가했습니다. 설정, 다운로드에서 대기열
 msgid "Added. Cross plays as this profile; left and right change its name."
 msgstr "추가했습니다. 엑스로 이 프로필로 플레이하고, 좌우로 이름을 바꿉니다."
 
-#: pe/ui/settings.cpp
-msgid "Adjust the essentials without leaving your library behind."
-msgstr "라이브러리를 벗어나지 않고 기본 설정을 조정하세요."
+#: pe/ui/library.cpp
+msgid "All cheats"
+msgstr "모든 치트"
 
 #: pe/ui/browse.cpp
 msgid "All credit for the Eden emulator goes to its developers and contributors."
@@ -109,9 +104,21 @@ msgstr "Eden 에뮬레이터의 모든 공로는 개발자와 기여자에게 �
 msgid "AMD FSR"
 msgstr "AMD FSR"
 
+#: pe/ui/settings.cpp
+msgid "An image of your own behind this menu."
+msgstr "이 메뉴 뒤에 원하는 이미지를 표시합니다."
+
 #: eden_services.cpp
 msgid "Another language"
 msgstr "다른 언어"
+
+#: pe/ui/settings.cpp
+msgid "Appearance"
+msgstr "모양"
+
+#: pe/ui/settings.cpp
+msgid "Apply"
+msgstr "적용"
 
 #. The button mapping has not been changed.
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
@@ -122,21 +129,18 @@ msgstr "평소대로"
 msgid "Asking the server for a code..."
 msgstr "서버에 코드를 요청하는 중..."
 
+#. Setting: how a game's textures in the ASTC format are held in graphics memory. ASTC is a format's name (unchanged).
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "ASTC textures"
+msgstr "ASTC 텍스처"
+
 #. A switch. A shader is a small graphics program; keep the word the language's players use for it.
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Asynchronous shaders"
 msgstr "비동기 셰이더"
 
-#: pe/ui/settings.cpp
-msgid "ASYNCHRONOUS SHADERS"
-msgstr "비동기 셰이더"
-
-#: pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Audio"
-msgstr "오디오"
-
-#: pe/ui/settings.cpp
-msgid "AUDIO"
 msgstr "오디오"
 
 #: eden_services.cpp
@@ -156,6 +160,10 @@ msgstr "자동"
 msgid "Back"
 msgstr "뒤로"
 
+#: pe/ui/settings.cpp
+msgid "Backend"
+msgstr "렌더러"
+
 #: pe/ui/save_sync.cpp
 msgid "Backing up save data"
 msgstr "세이브 데이터 백업 중"
@@ -170,22 +178,18 @@ msgstr "바이큐빅"
 msgid "Bilinear"
 msgstr "바이리니어"
 
+#: pe/ui/game_options.cpp
+msgid "Bottom left"
+msgstr "왼쪽 아래"
+
+#: pe/ui/game_options.cpp
+msgid "Bottom right"
+msgstr "오른쪽 아래"
+
 #. Button hint: move through the list.
 #: pe/ui/browse.cpp, pe/ui/multiplayer.cpp
 msgid "Browse"
 msgstr "이동"
-
-#: pe/ui/library.cpp
-msgid "Browse games"
-msgstr "게임 둘러보기"
-
-#: pe/ui/settings.cpp
-msgid "Browse settings"
-msgstr "설정 둘러보기"
-
-#: pe/ui/settings.cpp
-msgid "Browse the public directory"
-msgstr "공개 목록 둘러보기"
 
 #: pe/ui/multiplayer.cpp
 msgid "Browse the public directory and choose a room."
@@ -194,10 +198,6 @@ msgstr "공개 목록을 둘러보고 방을 선택하세요."
 #. Which controller button presses each of the game's buttons.
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Button mapping"
-msgstr "버튼 배치"
-
-#: pe/ui/settings.cpp
-msgid "BUTTON MAPPING"
 msgstr "버튼 배치"
 
 #: pe/ui/pairing.cpp, pe/ui/update.cpp
@@ -235,9 +235,14 @@ msgid "Changed"
 msgstr "변경됨"
 
 #. What a mod is made of: cheat codes.
-#: eden_services.cpp, host/fake_services.cpp
+#: eden_services.cpp, host/fake_services.cpp, pe/ui/library.cpp
 msgid "Cheats"
 msgstr "치트"
+
+#. Shown under a cheat that came from the game's cheats folder (not from a mod).
+#: pe/ui/library.cpp
+msgid "Cheats folder"
+msgstr "치트 폴더"
 
 #: pe/ui/pairing.cpp
 msgid "Check that the code there is this one, and approve."
@@ -272,6 +277,14 @@ msgstr "선택"
 msgid "Choose a game from your library."
 msgstr "라이브러리에서 게임을 선택하세요."
 
+#: pe/ui/settings.cpp
+msgid "Choose a theme or change the launcher layout."
+msgstr "테마를 고르거나 런처 레이아웃을 바꿉니다."
+
+#: pe/ui/settings.cpp
+msgid "Choose the colours and appearance of this menu."
+msgstr "이 메뉴의 색상과 모양을 고릅니다."
+
 #: pe/ui/browse.cpp
 msgid "Choose the folder that holds your keys, firmware and games"
 msgstr "키, 펌웨어, 게임이 들어 있는 폴더를 선택하세요"
@@ -289,24 +302,33 @@ msgstr "동그라미"
 msgid "Close"
 msgstr "닫기"
 
+#: pe/ui/settings.cpp
+msgid "Colour"
+msgstr "색상"
+
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "Compact memory"
+msgstr "메모리 압축"
+
 #. A switch: the program code a game used in earlier sessions is prepared (compiled) while the game starts. Keep it short.
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Compile ahead"
 msgstr "미리 컴파일"
 
 #: pe/ui/settings.cpp
-msgid "COMPILE AHEAD"
-msgstr "미리 컴파일"
-
-#: pe/ui/settings.cpp
 msgid "Compiles the code a game used before as it starts, so new areas stutter less."
 msgstr "게임이 이전에 사용한 코드를 시작할 때 컴파일하여 새 지역에서 끊김을 줄입니다."
+
+#. A choice of 'ASTC textures': the textures are kept compressed (less memory). Keep it short.
+#: settings_store.h
+msgid "Compressed"
+msgstr "압축"
 
 #: pe/ui/multiplayer.cpp
 msgid "Connect using a room address, port and password."
 msgstr "방 주소, 포트, 비밀번호로 연결합니다."
 
-#: pe/ui/home.cpp, pe/ui/multiplayer.cpp, pe/ui/settings.cpp
+#: pe/ui/home.cpp, pe/ui/multiplayer.cpp
 msgid "Connected"
 msgstr "연결됨"
 
@@ -330,7 +352,7 @@ msgstr "본체 모드"
 msgid "CONTINUE PLAYING"
 msgstr "이어서 플레이"
 
-#: pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Controller shortcuts and supported features."
 msgstr "컨트롤러 단축키와 지원 기능."
 
@@ -342,13 +364,13 @@ msgstr "컨트롤러 유형"
 msgid "CONTROLLERS"
 msgstr "컨트롤러"
 
-#: pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Controls"
 msgstr "조작"
 
 #: pe/ui/settings.cpp
-msgid "CONTROLS"
-msgstr "조작"
+msgid "Corner"
+msgstr "위치"
 
 #: pe/ui/remote.cpp
 msgid "Could not cancel the download."
@@ -370,10 +392,6 @@ msgstr "게임을 삭제할 수 없습니다."
 msgid "Could not delete {0}."
 msgstr "{0}을(를) 삭제할 수 없습니다."
 
-#: pe/ui/library.cpp
-msgid "Could not save console mode. Please try again."
-msgstr "본체 모드를 저장하지 못했습니다. 다시 시도해 주세요."
-
 #: pe/ui/launcher.cpp
 msgid "Could not save settings. Please try again."
 msgstr "설정을 저장하지 못했습니다. 다시 시도해 주세요."
@@ -389,6 +407,14 @@ msgstr "저장하지 못했습니다. 다시 시도해 주세요."
 #: pe/ui/multiplayer.cpp
 msgid "Could not start the connection or save its settings."
 msgstr "연결을 시작하거나 설정을 저장할 수 없습니다."
+
+#: pe/ui/settings.cpp
+msgid "CPU"
+msgstr "CPU"
+
+#: pe/ui/settings.cpp
+msgid "CPU by core"
+msgstr "코어별 CPU"
 
 #. The DualSense button labelled CREATE: keep the label if the language's players do.
 #: pe/ui/game_options.cpp
@@ -413,6 +439,10 @@ msgstr "크레딧 및 설정 안내"
 #: pe/ui/game_options.cpp
 msgid "Cross"
 msgstr "엑스"
+
+#: pe/ui/settings.cpp
+msgid "Default"
+msgstr "기본값"
 
 #. A per-game setting that follows the general setting; {0} is its value.
 #: pe/ui/game_options.cpp
@@ -448,10 +478,6 @@ msgid "Detailed logging"
 msgstr "상세 로그"
 
 #: pe/ui/settings.cpp
-msgid "DETAILED LOGS"
-msgstr "상세 로그"
-
-#: pe/ui/settings.cpp
 msgid "Detailed logs apply to the next game launch."
 msgstr "상세 로그는 다음 게임 실행부터 적용됩니다."
 
@@ -459,21 +485,12 @@ msgstr "상세 로그는 다음 게임 실행부터 적용됩니다."
 msgid "Detailed logs on"
 msgstr "상세 로그 켜짐"
 
-#. Button hint: show the game's details.
-#: pe/ui/home.cpp
-msgid "Details"
-msgstr "상세 정보"
-
 #: pe/ui/settings.cpp
 msgid "Diagnostics"
 msgstr "진단"
 
-#: pe/ui/settings.cpp
-msgid "DIAGNOSTICS"
-msgstr "진단"
-
 #. Console mode: the console as if connected to a TV. Keep it short (about 9 letters).
-#: pe/ui/library.cpp
+#: pe/ui/library.cpp, pe/ui/shell.cpp
 msgid "Docked"
 msgstr "TV 모드"
 
@@ -526,10 +543,6 @@ msgstr "다운로드 중 {0}"
 msgid "Downloads"
 msgstr "다운로드"
 
-#: pe/ui/settings.cpp
-msgid "DOWNLOADS"
-msgstr "다운로드"
-
 #: pe/ui/remote.cpp
 msgid "Downloads need an FTP server running on the console, on port {0}."
 msgstr "다운로드하려면 본체의 포트 {0}에서 FTP 서버가 실행 중이어야 합니다."
@@ -562,23 +575,18 @@ msgstr "프로필마다 서버의 개별 사용자로 세이브 데이터를 보
 msgid "Each profile's save data on a server of its own, synced before and after a game."
 msgstr "각 프로필의 세이브 데이터를 전용 서버에 보관하고 게임 전후에 동기화합니다."
 
-#: pe/ui/home.cpp
-msgid "Eden emulator for PlayStation 5"
-msgstr "PlayStation 5용 Eden 에뮬레이터"
-
 #: pe/ui/settings.cpp
 msgid "Eden's debug messages in the logs of a game."
 msgstr "게임 로그에 Eden의 디버그 메시지를 남깁니다."
 
 #. A button hint: opens the keyboard to type a number. One short word, and not the word used for Change.
-#: pe/ui/game_options.cpp
+#: pe/ui/library.cpp
 msgid "Edit"
 msgstr "편집"
 
-#. Label of the shortcut that ends the running game.
 #: pe/ui/settings.cpp
-msgid "END GAME"
-msgstr "게임 종료"
+msgid "Enable colors"
+msgstr "색 사용"
 
 #: pe/ui/settings.cpp
 msgid "End the game and return to this menu"
@@ -624,20 +632,12 @@ msgstr "{0}에 내보냈습니다."
 msgid "Faster CPU emulation"
 msgstr "더 빠른 CPU 에뮬레이션"
 
-#: pe/ui/settings.cpp
-msgid "FASTER CPU EMULATION"
-msgstr "더 빠른 CPU 에뮬레이션"
-
 #. A switch: memory transfers to the emulated graphics processor are less exact and faster. DMA is a name (unchanged).
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Faster DMA"
 msgstr "더 빠른 DMA"
 
-#: pe/ui/settings.cpp
-msgid "FASTER DMA"
-msgstr "더 빠른 DMA"
-
-#: pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Faster games, at some cost in accuracy."
 msgstr "정확도를 조금 낮추고 게임을 더 빠르게 합니다."
 
@@ -645,14 +645,6 @@ msgstr "정확도를 조금 낮추고 게임을 더 빠르게 합니다."
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Faster GPU emulation"
 msgstr "더 빠른 GPU 에뮬레이션"
-
-#: pe/ui/settings.cpp
-msgid "FASTER GPU EMULATION"
-msgstr "더 빠른 GPU 에뮬레이션"
-
-#: pe/ui/library.cpp
-msgid "FILE"
-msgstr "파일"
 
 #. What a mod is made of: files that replace the game's own.
 #: eden_services.cpp, host/fake_services.cpp
@@ -692,17 +684,12 @@ msgstr "설정을 따름"
 msgid "For every controller. A game can have its own."
 msgstr "모든 컨트롤러에 적용됩니다. 게임마다 따로 정할 수 있습니다."
 
-#: pe/ui/library.cpp
-msgid "FORMAT"
-msgstr "형식"
+#: pe/ui/settings.cpp
+msgid "FPS"
+msgstr "FPS"
 
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "FPS overlay"
-msgstr "FPS 표시"
-
-#. Label: the frames-per-second counter drawn over a game.
-#: pe/ui/settings.cpp
-msgid "FPS OVERLAY"
 msgstr "FPS 표시"
 
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
@@ -713,13 +700,17 @@ msgstr "프레임 생성 배율"
 msgid "Frame gen target"
 msgstr "프레임 생성 목표"
 
-#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp, pe/ui/shell.cpp
 msgid "Frame generation"
 msgstr "프레임 생성"
 
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Frame generation needs Lossless.dll, from Lossless Scaling, in the lossless folder."
 msgstr "프레임 생성에는 lossless 폴더에 Lossless Scaling의 Lossless.dll이 필요합니다."
+
+#: pe/ui/settings.cpp
+msgid "Frame time"
+msgstr "프레임 시간"
 
 #: settings_store.h
 msgid "French"
@@ -733,27 +724,28 @@ msgstr "프랑스어(캐나다)"
 msgid "From {0}"
 msgstr "{0}에서"
 
-#: pe/ui/settings.cpp
-msgid "FTP SERVER"
-msgstr "FTP 서버"
-
 #. The app can read every folder of the console.
 #: pe/ui/browse.cpp
 msgid "Full filesystem"
 msgstr "전체 파일 시스템"
 
-#: pe/ui/settings.cpp
+#. A choice of 'ASTC textures': the textures are kept uncompressed (more memory). Keep it short.
+#: settings_store.h
+msgid "Full quality"
+msgstr "전체 품질"
+
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Game audio; PS5 system-menu music is unchanged."
 msgstr "게임 소리입니다. PS5 시스템 메뉴 음악은 바뀌지 않습니다."
+
+#: pe/ui/launcher.cpp
+msgid "Game cannot start now."
+msgstr "지금은 게임을 시작할 수 없습니다."
 
 #. {0} is the reason, a sentence in English; {1} is a file.
 #: eden_services.cpp, host/fake_services.cpp
 msgid "Game could not start: {0} Details: {1}"
 msgstr "게임을 시작할 수 없습니다: {0} 자세한 내용: {1}"
-
-#: pe/ui/home.cpp
-msgid "Game details"
-msgstr "게임 상세 정보"
 
 #: pe/ui/library.cpp
 msgid "GAME DETAILS"
@@ -763,20 +755,12 @@ msgstr "게임 상세 정보"
 msgid "Game files"
 msgstr "게임 파일"
 
-#: pe/ui/settings.cpp
-msgid "GAME FILES"
-msgstr "게임 파일"
-
-#: pe/ui/library.cpp
+#: pe/ui/home.cpp, pe/ui/library.cpp
 msgid "Game settings"
 msgstr "게임 설정"
 
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Game volume"
-msgstr "게임 음량"
-
-#: pe/ui/settings.cpp
-msgid "GAME VOLUME"
 msgstr "게임 음량"
 
 #: pe/ui/settings.cpp
@@ -807,9 +791,17 @@ msgstr "독일어"
 msgid "GETTING STARTED"
 msgstr "시작하기"
 
+#: pe/ui/settings.cpp
+msgid "Gives back memory a game left empty, 16 KiB at a time. More free memory; a game that writes there again can stutter for a moment."
+msgstr "게임이 비워 둔 메모리를 16KiB 단위로 반환합니다. 여유 메모리가 늘어나며, 그곳에 다시 쓰는 게임은 잠깐 끊길 수 있습니다."
+
 #: pe/ui/multiplayer.cpp
 msgid "Go offline"
 msgstr "오프라인으로 전환"
+
+#: pe/ui/settings.cpp
+msgid "GPU"
+msgstr "GPU"
 
 #: pe/ui/settings.cpp
 msgid "Graphics backend and how games are scaled to your TV."
@@ -820,22 +812,27 @@ msgid "Graphics backend initialization failed. Try another backend in Settings; 
 msgstr "그래픽 백엔드를 초기화하지 못했습니다. 설정에서 다른 백엔드를 사용해 보세요. 드라이버 정보는 stderr.log와 eden_log.txt를 참고하세요."
 
 #. Console mode: the console as if held in the hands. Keep it short (about 9 letters).
-#: pe/ui/game_options.cpp, pe/ui/library.cpp
+#: pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/shell.cpp
 msgid "Handheld"
 msgstr "휴대 모드"
-
-#: pe/ui/settings.cpp
-msgid "HIGH CONTRAST"
-msgstr "고대비"
 
 #. A switch: solid dark panels, brighter text.
 #: pe/ui/settings.cpp
 msgid "High contrast"
 msgstr "고대비"
 
-#: pe/ui/settings.cpp
+#. The menu's first section, its opening screen (not a house, and not the PS5's own home screen).
+#: pe/ui/shell.cpp
+msgid "Home"
+msgstr "홈"
+
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "How games are drawn and scaled to your TV."
 msgstr "게임을 그리는 방식과 TV에 맞춘 확대 방식."
+
+#: pe/ui/settings.cpp
+msgid "Images in this folder: {0}"
+msgstr "이 폴더의 이미지: {0}"
 
 #. Button hint: copy a save in.
 #: pe/ui/library.cpp
@@ -855,7 +852,7 @@ msgid "Imported. The save it replaced was backed up."
 msgstr "가져왔습니다. 대체된 세이브 데이터는 백업했습니다."
 
 #. Tag on the language or folder that is in use now.
-#: pe/ui/browse.cpp, pe/ui/settings.cpp
+#: pe/ui/browse.cpp
 msgid "IN USE"
 msgstr "사용 중"
 
@@ -899,10 +896,6 @@ msgstr "게임을 실행하기 전에 방에 참가한 다음 게임에서 로�
 msgid "Join a room successfully or leave it before starting a game."
 msgstr "게임을 시작하기 전에 방에 참가하거나 방에서 나가세요."
 
-#: pe/ui/settings.cpp
-msgid "Join an Eden room, then choose Local Wireless in a supported game. Everyone needs a compatible game version."
-msgstr "Eden 방에 참가한 다음 지원되는 게임에서 로컬 통신을 선택하세요. 모두 호환되는 게임 버전이 필요합니다."
-
 #: pe/ui/multiplayer.cpp
 msgid "Join room"
 msgstr "방 참가"
@@ -941,21 +934,17 @@ msgstr "한국"
 msgid "Korean"
 msgstr "한국어"
 
-#: pe/ui/browse.cpp, pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
+#: pe/ui/browse.cpp, pe/ui/game_options.cpp, pe/ui/home.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Language"
-msgstr "언어"
-
-#: pe/ui/library.cpp, pe/ui/settings.cpp
-msgid "LANGUAGE"
 msgstr "언어"
 
 #: pe/ui/browse.cpp
 msgid "LANGUAGES"
 msgstr "언어"
 
-#: pe/ui/settings.cpp
-msgid "LARGER TEXT"
-msgstr "큰 글자"
+#: pe/ui/game_options.cpp
+msgid "Large"
+msgstr "크게"
 
 #. A switch: the menu's small text is drawn larger.
 #: pe/ui/settings.cpp
@@ -967,9 +956,9 @@ msgstr "큰 글자"
 msgid "Last game opened"
 msgstr "마지막으로 연 게임"
 
-#: pe/ui/home.cpp
-msgid "Launch game"
-msgstr "게임 실행"
+#: pe/ui/settings.cpp
+msgid "Launcher"
+msgstr "런처"
 
 #: pe/ui/multiplayer.cpp
 msgid "Leave / cancel"
@@ -1008,15 +997,15 @@ msgstr "덜 정확한 부동 소수점 연산: 더 빠르지만 일부 게임이
 msgid "Less exact memory transfers to the GPU: faster, and a few games show wrong graphics."
 msgstr "GPU로의 메모리 전송이 덜 정확함: 더 빠르지만 일부 게임에서 그래픽이 잘못 보입니다."
 
-#: pe/ui/home.cpp
-msgid "Library"
-msgstr "라이브러리"
-
 #: pe/ui/library.cpp
 msgid "LIBRARY"
 msgstr "라이브러리"
 
-#: pe/ui/pairing.cpp, pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/shell.cpp
+msgid "Library"
+msgstr "라이브러리"
+
+#: pe/ui/pairing.cpp
 msgid "Linked"
 msgstr "연결됨"
 
@@ -1028,22 +1017,25 @@ msgstr "공개 방을 불러오는 중..."
 msgid "Lowest GPU accuracy: faster in demanding games, and graphics can be wrong."
 msgstr "가장 낮은 GPU 정확도: 무거운 게임에서 더 빠르지만 그래픽이 잘못 보일 수 있습니다."
 
-#. Headline of the Settings screen.
-#: pe/ui/settings.cpp
-msgid "Make it yours."
-msgstr "나만의 설정으로."
-
 #: pe/ui/settings.cpp
 msgid "Make the menu easier to see and follow."
 msgstr "메뉴를 더 보기 쉽고 따라가기 쉽게 만듭니다."
 
+#: pe/ui/game_options.cpp
+msgid "Medium"
+msgstr "중간"
+
+#: pe/ui/settings.cpp
+msgid "Memory"
+msgstr "메모리"
+
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "Menu keybinds"
+msgstr "메뉴 버튼"
+
 #: pe/ui/browse.cpp
 msgid "Menu sound effects made with ElevenLabs."
 msgstr "메뉴 효과음은 ElevenLabs로 제작했습니다."
-
-#: pe/ui/settings.cpp
-msgid "MENU SOUNDS"
-msgstr "메뉴 효과음"
 
 #: pe/ui/settings.cpp
 msgid "Menu sounds"
@@ -1063,11 +1055,11 @@ msgstr "모드"
 msgid "Mods"
 msgstr "모드"
 
-#: pe/ui/home.cpp, pe/ui/multiplayer.cpp, pe/ui/settings.cpp
+#: pe/ui/home.cpp, pe/ui/multiplayer.cpp, pe/ui/shell.cpp
 msgid "Multiplayer"
 msgstr "멀티플레이"
 
-#: pe/ui/settings.cpp
+#: pe/ui/multiplayer.cpp
 msgid "MULTIPLAYER"
 msgstr "멀티플레이"
 
@@ -1076,15 +1068,11 @@ msgid "Mute"
 msgstr "음소거"
 
 #: pe/ui/settings.cpp
-msgid "MUTE"
-msgstr "음소거"
-
-#: pe/ui/settings.cpp
 msgid "Muted"
 msgstr "음소거됨"
 
 #. Button hint: move the highlight.
-#: pe/ui/home.cpp, pe/ui/update.cpp
+#: pe/ui/update.cpp
 msgid "Navigate"
 msgstr "이동"
 
@@ -1097,6 +1085,10 @@ msgstr "니어리스트"
 msgid "Needs attention"
 msgstr "확인 필요"
 
+#: pe/ui/theme.cpp
+msgid "Neutral glass, clean and still."
+msgstr "중립적인 유리, 깔끔하고 차분함."
+
 #: pe/ui/profiles.cpp
 msgid "New profile"
 msgstr "새 프로필"
@@ -1105,11 +1097,6 @@ msgstr "새 프로필"
 #: pe/ui/browse.cpp
 msgid "Next launch: {0}"
 msgstr "다음 실행: {0}"
-
-#. Label: the folder used the next time the app starts.
-#: pe/ui/settings.cpp
-msgid "NEXT START"
-msgstr "다음 실행"
 
 #: pe/ui/multiplayer.cpp
 msgid "Nickname"
@@ -1120,8 +1107,13 @@ msgid "Nickname: {0}"
 msgstr "닉네임: {0}"
 
 #: pe/ui/library.cpp
-msgid "No cover art"
-msgstr "커버 이미지 없음"
+msgid "No cheats"
+msgstr "치트 없음"
+
+#. <build ID>.txt stays as it is: a cheat file is named after the game version's build ID. {0} is a folder such as roms/Game/cheats/.
+#: pe/ui/library.cpp
+msgid "No cheats for this game yet. Copy its cheat files (<build ID>.txt) to {0}."
+msgstr "이 게임에는 아직 치트가 없습니다. 치트 파일(<build ID>.txt)을 {0}에 복사하세요."
 
 #: pe/ui/remote.cpp
 msgid "No download source is set up. Save a file named {0} that lists your sources, as this one does with a RomM server, then open this menu again. Downloads need an FTP server running on the console, on port {1}."
@@ -1148,10 +1140,9 @@ msgstr "여기에는 폴더가 없습니다."
 msgid "No mods"
 msgstr "모드 없음"
 
-#. {0} is a folder; roms/ is a folder name (unchanged).
 #: pe/ui/library.cpp
-msgid "No mods for this game yet. Copy each mod's folder to {0}, next to roms/."
-msgstr "이 게임에는 아직 모드가 없습니다. 각 모드의 폴더를 roms/ 옆의 {0}에 복사하세요."
+msgid "No mods for this game yet. Copy each mod's folder to {0}."
+msgstr "이 게임에는 아직 모드가 없습니다. 각 모드의 폴더를 {0}에 복사하세요."
 
 #: pe/ui/multiplayer.cpp
 msgid "No public rooms are available."
@@ -1186,7 +1177,7 @@ msgstr "없음"
 msgid "Not connected yet"
 msgstr "아직 연결되지 않음"
 
-#: pe/ui/pairing.cpp, pe/ui/settings.cpp
+#: pe/ui/pairing.cpp
 msgid "Not linked"
 msgstr "연결 안 됨"
 
@@ -1198,10 +1189,6 @@ msgstr "연결 안 됨: 세이브 데이터는 본체에 남습니다"
 msgid "Not on the console"
 msgstr "본체에 없음"
 
-#: pe/ui/library.cpp
-msgid "Not on the console yet. Download it to play and to change its settings."
-msgstr "아직 본체에 없습니다. 다운로드하면 플레이하고 설정을 변경할 수 있습니다."
-
 #: pe/ui/pairing.cpp
 msgid "Not paired"
 msgstr "페어링 안 됨"
@@ -1209,10 +1196,6 @@ msgstr "페어링 안 됨"
 #: pe/ui/remote.cpp
 msgid "Not reachable"
 msgstr "연결할 수 없음"
-
-#: pe/ui/settings.cpp
-msgid "Not readable"
-msgstr "읽을 수 없음"
 
 #: pe/ui/settings.cpp
 msgid "Not set up"
@@ -1228,7 +1211,7 @@ msgstr "가져올 항목 없음"
 msgid "Off"
 msgstr "끔"
 
-#: pe/ui/multiplayer.cpp, pe/ui/settings.cpp
+#: pe/ui/multiplayer.cpp
 msgid "Offline"
 msgstr "오프라인"
 
@@ -1237,17 +1220,13 @@ msgstr "오프라인"
 msgid "On"
 msgstr "켬"
 
-#: pe/ui/settings.cpp
-msgid "ON THIS CONSOLE"
-msgstr "이 본체"
-
 #. Short tag on a folder row.
 #: pe/ui/browse.cpp
 msgid "OPEN"
 msgstr "열기"
 
 #. Button hint: open the highlighted folder.
-#: pe/ui/browse.cpp, pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
+#: pe/ui/browse.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Open"
 msgstr "열기"
 
@@ -1264,15 +1243,22 @@ msgstr "라이브러리 열기"
 msgid "Options"
 msgstr "OPTIONS"
 
-#. Label: see 'Output resolution'.
-#: pe/ui/settings.cpp
-msgid "OUTPUT RESOLUTION"
-msgstr "출력 해상도"
-
 #. Setting: the size of the picture sent to the TV (1080p, 1440p or 2160p). Not the same as 'Resolution', which scales the game's own picture (1x, 2x...).
 #: pe/ui/settings.cpp
 msgid "Output resolution"
 msgstr "출력 해상도"
+
+#: pe/ui/game_options.cpp
+msgid "Overlay corner"
+msgstr "표시 위치"
+
+#: pe/ui/settings.cpp
+msgid "Overlay options"
+msgstr "표시 옵션"
+
+#: pe/ui/game_options.cpp
+msgid "Overlay size"
+msgstr "표시 크기"
 
 #. Button hint: jump a page of the list (L1 / R1).
 #: pe/ui/browse.cpp, pe/ui/multiplayer.cpp, pe/ui/update.cpp
@@ -1317,13 +1303,18 @@ msgid "Patch"
 msgstr "패치"
 
 #. A settings category: options that make games run faster, at some cost in accuracy.
-#: pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Performance"
 msgstr "성능"
 
 #: pe/ui/settings.cpp
-msgid "PERFORMANCE"
-msgstr "성능"
+msgid "Ping"
+msgstr "핑"
+
+#. Button and button hint: start the game shown. Keep it to one short word.
+#: pe/ui/home.cpp, pe/ui/library.cpp
+msgid "Play"
+msgstr "플레이"
 
 #: pe/ui/save_sync.cpp
 msgid "Play anyway"
@@ -1349,10 +1340,6 @@ msgstr "플레이 중"
 msgid "Playing"
 msgstr "플레이 중"
 
-#: pe/ui/settings.cpp
-msgid "PLAYING"
-msgstr "플레이 중"
-
 #: pe/ui/profiles.cpp
 msgid "Playing as {0}"
 msgstr "{0}(으)로 플레이"
@@ -1360,10 +1347,6 @@ msgstr "{0}(으)로 플레이"
 #: settings_store.h
 msgid "Polish"
 msgstr "폴란드어"
-
-#: pe/ui/settings.cpp
-msgid "Port {0}"
-msgstr "포트 {0}"
 
 #: settings_store.h
 msgid "Portuguese"
@@ -1373,14 +1356,14 @@ msgstr "포르투갈어"
 msgid "Portuguese (Brazil)"
 msgstr "포르투갈어(브라질)"
 
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "Post-processing"
+msgstr "후처리"
+
 #. Eden is the emulator's name (unchanged).
 #: pe/ui/browse.cpp
 msgid "Powered by Eden"
 msgstr "Powered by Eden"
-
-#: pe/ui/settings.cpp
-msgid "PREFERENCES"
-msgstr "환경 설정"
 
 #. Update dialog headline while the download starts.
 #: pe/ui/remote.cpp, pe/ui/update.cpp
@@ -1400,7 +1383,7 @@ msgstr "다시 누르면 이 게임의 세이브 데이터를 교체합니다. �
 msgid "Private room"
 msgstr "비공개 방"
 
-#: pe/ui/settings.cpp
+#: pe/ui/multiplayer.cpp
 msgid "PRIVATE ROOM"
 msgstr "비공개 방"
 
@@ -1426,10 +1409,6 @@ msgstr "프로필 {0}"
 
 #: pe/ui/profiles.cpp, pe/ui/settings.cpp
 msgid "Profiles"
-msgstr "프로필"
-
-#: pe/ui/settings.cpp
-msgid "PROFILES"
 msgstr "프로필"
 
 #: pe/ui/browse.cpp
@@ -1470,18 +1449,17 @@ msgstr "PS5 컨트롤러를 초기화하지 못했습니다"
 msgid "PS5 EDITION"
 msgstr "PS5 에디션"
 
-#. {0} is the version, for example v1.000.030.
-#: pe/ui/home.cpp
-msgid "PS5 EDITION  /  {0}"
-msgstr "PS5 에디션  /  {0}"
-
 #: pe/ui/multiplayer.cpp
 msgid "Public rooms"
 msgstr "공개 방"
 
-#: pe/ui/settings.cpp
+#: pe/ui/multiplayer.cpp
 msgid "PUBLIC ROOMS"
 msgstr "공개 방"
+
+#: pe/ui/settings.cpp
+msgid "Put images in the wallpapers folder to show them here."
+msgstr "wallpapers 폴더에 이미지를 넣으면 여기에 표시됩니다."
 
 #: pe/ui/remote.cpp
 msgid "Queued"
@@ -1501,10 +1479,6 @@ msgstr "무작위"
 msgid "Reactive flushing"
 msgstr "반응형 플러싱"
 
-#: pe/ui/settings.cpp
-msgid "REACTIVE FLUSHING"
-msgstr "반응형 플러싱"
-
 #: pe/ui/remote.cpp
 msgid "Read the lists again"
 msgstr "목록 다시 읽기"
@@ -1513,7 +1487,7 @@ msgstr "목록 다시 읽기"
 msgid "Reading the game lists..."
 msgstr "게임 목록을 읽는 중..."
 
-#: pe/ui/remote.cpp, pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/remote.cpp
 msgid "Reading..."
 msgstr "읽는 중..."
 
@@ -1524,10 +1498,6 @@ msgstr "준비됨"
 #: pe/ui/home.cpp
 msgid "RECENTLY PLAYED"
 msgstr "최근 플레이"
-
-#: pe/ui/settings.cpp
-msgid "REDUCE MOTION"
-msgstr "움직임 줄이기"
 
 #. A switch: no drifting, sliding or zooming on screen.
 #: pe/ui/settings.cpp
@@ -1543,14 +1513,13 @@ msgstr "새로 고침"
 msgid "Refresh rate"
 msgstr "주사율"
 
-#. Label: see 'Refresh rate'.
-#: pe/ui/settings.cpp
-msgid "REFRESH RATE"
-msgstr "주사율"
-
-#: pe/ui/browse.cpp, pe/ui/settings.cpp
+#: pe/ui/browse.cpp
 msgid "REGION"
 msgstr "지역"
+
+#: pe/ui/game_options.cpp
+msgid "Regular"
+msgstr "보통"
 
 #: pe/ui/profiles.cpp
 msgid "Remove"
@@ -1564,20 +1533,12 @@ msgstr "이름 변경"
 msgid "Renderer"
 msgstr "렌더러"
 
-#: pe/ui/settings.cpp
-msgid "RENDERER"
-msgstr "렌더러"
-
 #: pe/ui/game_options.cpp
 msgid "Reset"
 msgstr "초기화"
 
 #: pe/ui/game_options.cpp, pe/ui/settings.cpp
 msgid "Resolution"
-msgstr "해상도"
-
-#: pe/ui/settings.cpp
-msgid "RESOLUTION"
 msgstr "해상도"
 
 #: pe/ui/game_options.cpp
@@ -1600,10 +1561,6 @@ msgstr "게임 파일 폴더에 ROM이 없습니다"
 #: pe/ui/multiplayer.cpp
 msgid "Room address"
 msgstr "방 주소"
-
-#: pe/ui/settings.cpp
-msgid "Room address and UDP port"
-msgstr "방 주소 및 UDP 포트"
 
 #: pe/ui/multiplayer.cpp
 msgid "Room {0} of {1}"
@@ -1661,14 +1618,6 @@ msgstr "세이브 폴더 있음"
 msgid "Save sync"
 msgstr "세이브 데이터 동기화"
 
-#: pe/ui/settings.cpp
-msgid "SAVE SYNC"
-msgstr "세이브 데이터 동기화"
-
-#: pe/ui/settings.cpp
-msgid "SAVE-SYNC.JSON"
-msgstr "SAVE-SYNC.JSON"
-
 #: pe/ui/pairing.cpp
 msgid "save-sync.json cannot be read ({0}). Nothing syncs until it is corrected over FTP."
 msgstr "save-sync.json을 읽을 수 없습니다({0}). FTP로 수정할 때까지 동기화되지 않습니다."
@@ -1694,13 +1643,31 @@ msgstr "저장 시각: {0}. 이 본체의 데이터를 대체합니다."
 msgid "Saved. A display that cannot show 120 Hz stays at 60 Hz."
 msgstr "저장했습니다. 120Hz를 지원하지 않는 디스플레이는 60Hz로 유지됩니다."
 
+#: pe/ui/settings.cpp
+msgid "Saved. Applies the next time ProsperoEden opens."
+msgstr "저장했습니다. 다음에 ProsperoEden을 열 때 적용됩니다."
+
 #: pe/ui/browse.cpp, pe/ui/launcher.cpp
 msgid "Saved. Applies when a game starts."
 msgstr "저장했습니다. 게임을 시작할 때 적용됩니다."
 
+#. Shown after choosing 'Full quality' for 'ASTC textures'. 1x is a resolution scale (unchanged). It has two lines: keep it short.
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "Saved. Full quality uses four times the graphics memory for these textures and can run out above 1x."
+msgstr "저장했습니다. 전체 품질은 이 텍스처에 그래픽 메모리를 4배 사용하며 1x를 넘으면 부족할 수 있습니다."
+
+#: pe/ui/settings.cpp
+msgid "Saved. Post-processing needs the Vulkan renderer."
+msgstr "저장했습니다. 후처리에는 Vulkan 렌더러가 필요합니다."
+
 #: pe/ui/browse.cpp
 msgid "Saved. Reopen ProsperoEden to use this folder."
 msgstr "저장했습니다. ProsperoEden을 다시 열면 이 폴더를 사용합니다."
+
+#. About the Update notices switch; homebrew.page is a site's name and stays as it is; About is the menu's last section (use its translation).
+#: pe/ui/settings.cpp
+msgid "Says when homebrew.page has a newer version. Off, only About names it."
+msgstr "homebrew.page에 새 버전이 있으면 알려 줍니다. 끄면 정보에만 표시됩니다."
 
 #: pe/ui/pairing.cpp
 msgid "Scan the code with your phone, or open the address below."
@@ -1711,22 +1678,19 @@ msgstr "휴대폰으로 코드를 스캔하거나 아래 주소를 여세요."
 msgid "Scroll"
 msgstr "스크롤"
 
+#: pe/ui/game_options.cpp
+msgid "Secondary"
+msgstr "보조 동작"
+
+#. Button hint beside L1 and R1: they move between the menu's sections (Home, Library, Multiplayer, Settings, About).
+#: pe/ui/browse.cpp, pe/ui/home.cpp, pe/ui/library.cpp, pe/ui/multiplayer.cpp, pe/ui/settings.cpp
+msgid "Sections"
+msgstr "섹션"
+
 #. Button hint: choose the highlighted item (not the Select button).
 #: pe/ui/game_options.cpp, pe/ui/home.cpp, pe/ui/library.cpp, pe/ui/multiplayer.cpp, pe/ui/pairing.cpp, pe/ui/remote.cpp, pe/ui/save_sync.cpp, pe/ui/settings.cpp, pe/ui/update.cpp
 msgid "Select"
 msgstr "선택"
-
-#: pe/ui/library.cpp
-msgid "Select a game"
-msgstr "게임 선택"
-
-#: pe/ui/library.cpp
-msgid "Select a game to begin"
-msgstr "게임을 선택해 시작하세요"
-
-#: pe/ui/library.cpp
-msgid "Select a readable game to configure its mode."
-msgstr "모드를 설정하려면 읽을 수 있는 게임을 선택하세요."
 
 #. Heading: the language highlighted in the list.
 #: pe/ui/browse.cpp
@@ -1742,14 +1706,13 @@ msgstr "선택한 ROM을 더 이상 사용할 수 없습니다"
 msgid "Server too old for save sync"
 msgstr "서버가 오래되어 동기화할 수 없음"
 
-#: pe/ui/home.cpp, pe/ui/settings.cpp
+#: pe/ui/home.cpp, pe/ui/settings.cpp, pe/ui/shell.cpp
 msgid "Settings"
 msgstr "설정"
 
-#. Label: whether keys and firmware are in place.
 #: pe/ui/settings.cpp
-msgid "SETUP"
-msgstr "설정 상태"
+msgid "SETTINGS"
+msgstr "설정"
 
 #: eden_services.cpp, host/fake_services.cpp
 msgid "Setup required"
@@ -1776,6 +1739,10 @@ msgid "Several sources have this game. Which one should it come from?"
 msgstr "이 게임이 여러 소스에 있습니다. 어디에서 받을까요?"
 
 #: pe/ui/settings.cpp
+msgid "Show an image of your own behind the menu."
+msgstr "메뉴 뒤에 원하는 이미지를 표시합니다."
+
+#: pe/ui/settings.cpp
 msgid "Show or hide the FPS overlay"
 msgstr "FPS 표시 켜기/끄기"
 
@@ -1787,8 +1754,8 @@ msgstr "이전 목록을 표시합니다."
 msgid "Sign in to {0} as the user this profile's save data belongs to."
 msgstr "이 프로필의 세이브 데이터가 속한 사용자로 {0}에 로그인하세요."
 
-#: pe/ui/library.cpp
-msgid "SIZE"
+#: pe/ui/settings.cpp
+msgid "Size"
 msgstr "크기"
 
 #. Button and hint: not now (the dialog shows again the next time the app opens).
@@ -1802,24 +1769,12 @@ msgid "Skip CPU invalidation"
 msgstr "CPU 무효화 건너뛰기"
 
 #: pe/ui/settings.cpp
-msgid "SKIP CPU INVALIDATION"
-msgstr "CPU 무효화 건너뛰기"
-
-#: pe/ui/settings.cpp
 msgid "Skips some checks when a game changes memory the GPU uses: faster, and textures can be stale."
 msgstr "GPU가 쓰는 메모리를 게임이 바꿀 때 일부 검사를 건너뜁니다. 더 빠르지만 텍스처가 오래된 상태일 수 있습니다."
 
 #: pe/ui/settings.cpp
 msgid "Solid panels, brighter text and an outlined highlight."
 msgstr "불투명한 패널, 더 밝은 글자, 테두리가 있는 강조 표시."
-
-#: pe/ui/library.cpp
-msgid "SOURCE"
-msgstr "소스"
-
-#: pe/ui/library.cpp, pe/ui/settings.cpp
-msgid "SOURCES"
-msgstr "소스"
 
 #: settings_store.h
 msgid "Spanish"
@@ -1828,6 +1783,15 @@ msgstr "스페인어"
 #: settings_store.h
 msgid "Spanish (Latin America)"
 msgstr "스페인어(중남미)"
+
+#: pe/ui/settings.cpp
+msgid "Speed"
+msgstr "속도"
+
+#. Settings > Performance: how fast a game may run, as a percentage of the console it was made for.
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "Speed limit"
+msgstr "속도 제한"
 
 #. A DualSense button.
 #: pe/ui/game_options.cpp
@@ -1852,10 +1816,6 @@ msgstr "세이브 데이터를 가져오기 전에 아무 게임이나 한 번 �
 msgid "STARTING"
 msgstr "시작 중"
 
-#: pe/ui/library.cpp
-msgid "STATE"
-msgstr "상태"
-
 #: pe/ui/settings.cpp
 msgid "Stops the background drifting and the screens sliding, here and on the loading screen."
 msgstr "배경의 움직임과 화면 슬라이드를 멈춥니다. 로딩 화면에도 적용됩니다."
@@ -1863,10 +1823,6 @@ msgstr "배경의 움직임과 화면 슬라이드를 멈춥니다. 로딩 화�
 #: pe/ui/browse.cpp
 msgid "Supply your own files"
 msgstr "파일은 직접 준비하세요"
-
-#: pe/ui/settings.cpp
-msgid "SYNC"
-msgstr "동기화"
 
 #: pe/ui/save_sync.cpp
 msgid "Sync the save data once more."
@@ -1877,7 +1833,7 @@ msgid "Syncing save data"
 msgstr "세이브 데이터 동기화 중"
 
 #. A category of a game's settings: how the emulated console itself behaves.
-#: pe/ui/game_options.cpp, pe/ui/library.cpp
+#: pe/ui/library.cpp
 msgid "System"
 msgstr "시스템"
 
@@ -1905,6 +1861,10 @@ msgstr "감사의 말"
 #: pe/ui/browse.cpp
 msgid "Thanks to the whole PS5 homebrew community and to every developer whose drivers, tools and libraries make ProsperoEden possible."
 msgstr "PS5 홈브루 커뮤니티 여러분과 ProsperoEden을 가능하게 한 드라이버, 도구, 라이브러리의 모든 개발자에게 감사드립니다."
+
+#: pe/ui/settings.cpp
+msgid "The accent colour of the current theme."
+msgstr "현재 테마의 강조 색상."
 
 #: pe/ui/remote.cpp
 msgid "The download stopped"
@@ -1947,9 +1907,14 @@ msgstr "다운로드가 끝나면 게임이 시작됩니다."
 msgid "The keyboard could not be opened."
 msgstr "키보드를 열 수 없습니다."
 
-#: pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "The language games use when they offer it."
 msgstr "게임이 지원할 때 사용할 언어."
+
+#. Under the title Theme: what a theme changes.
+#: pe/ui/settings.cpp
+msgid "The look of this menu."
+msgstr "이 메뉴의 모양입니다."
 
 #: pe/ui/pairing.cpp
 msgid "The profile or the server is no longer there."
@@ -1988,6 +1953,15 @@ msgstr "소스에 이 게임이 더 이상 없습니다."
 msgid "The update could not finish"
 msgstr "업데이트를 완료할 수 없습니다"
 
+#. A tile of Settings and its dialog's title: the look of this menu (its colours and artwork).
+#: pe/ui/settings.cpp
+msgid "Theme"
+msgstr "테마"
+
+#: pe/ui/settings.cpp
+msgid "Theme and launcher settings."
+msgstr "테마 및 런처 설정."
+
 #: pe/ui/save_sync.cpp
 msgid "This console and the server both have save data the other does not know. Which one should stay? The other is kept as a backup."
 msgstr "이 본체와 서버에 서로 모르는 세이브 데이터가 각각 있습니다. 어느 쪽을 남길까요? 다른 쪽은 백업으로 보관됩니다."
@@ -2022,8 +1996,16 @@ msgstr "이 방은 다른 프로토콜 버전을 사용합니다."
 msgid "To import, copy a Ryujinx folder to ryujinx/ or a save to save-import/{0}/, next to roms/."
 msgstr "가져오려면 Ryujinx 폴더를 ryujinx/에, 또는 세이브 데이터를 save-import/{0}/에 복사하세요(roms/ 옆)."
 
+#: pe/ui/game_options.cpp
+msgid "Top left"
+msgstr "왼쪽 위"
+
+#: pe/ui/game_options.cpp
+msgid "Top right"
+msgstr "오른쪽 위"
+
 #. The DualSense controller's touch pad, pressed as a button. Use the name players know.
-#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+#: pe/ui/game_options.cpp
 msgid "Touchpad"
 msgstr "터치패드"
 
@@ -2031,6 +2013,11 @@ msgstr "터치패드"
 #: pe/ui/game_options.cpp
 msgid "Triangle"
 msgstr "세모"
+
+#. One line about the theme named Canopy: its artwork is a tropical sunset, its panels are dark green glass, its accent colour is lime green.
+#: pe/ui/theme.cpp
+msgid "Tropical dusk, dark green glass and lime."
+msgstr "열대의 황혼, 짙은 녹색 유리와 라임색."
 
 #: pe/ui/pairing.cpp, pe/ui/remote.cpp, pe/ui/save_sync.cpp, pe/ui/update.cpp
 msgid "Try again"
@@ -2057,6 +2044,11 @@ msgstr "사용할 수 없음"
 msgid "Understood"
 msgstr "확인"
 
+#. A Speed limit choice: no limit at all (as fast as the console can).
+#: pe/ui/game_options.cpp, pe/ui/settings.cpp
+msgid "Unlimited"
+msgstr "제한 없음"
+
 #: pe/ui/pairing.cpp
 msgid "Unlink"
 msgstr "연결 해제"
@@ -2080,6 +2072,11 @@ msgstr "위로"
 msgid "Update available"
 msgstr "업데이트가 있습니다"
 
+#. Settings switch: whether the app says at its start that a newer release of this app is listed (not game updates).
+#: pe/ui/settings.cpp
+msgid "Update notices"
+msgstr "업데이트 알림"
+
 #. Button: download and install the newer release of this app now.
 #: pe/ui/update.cpp
 msgid "Update now"
@@ -2102,13 +2099,13 @@ msgstr "업데이트, DLC"
 msgid "Upscaling filter"
 msgstr "확대 필터"
 
-#: pe/ui/settings.cpp
-msgid "UPSCALING FILTER"
-msgstr "확대 필터"
-
 #: eden_services.cpp
 msgid "USA"
 msgstr "미국"
+
+#: pe/ui/settings.cpp
+msgid "Use another home screen, library and menu layout."
+msgstr "다른 홈 화면, 라이브러리, 메뉴 레이아웃을 사용합니다."
 
 #: pe/ui/browse.cpp
 msgid "Use extracted firmware NCA files. Choose the folder in Settings, Game files; restart the app after changing it."
@@ -2124,7 +2121,7 @@ msgid "Version {0}"
 msgstr "버전 {0}"
 
 #. {0}: the newer release's number, for example 1.000.050; homebrew.page is a site's name and stays as it is.
-#: pe/ui/launcher.cpp
+#: pe/ui/browse.cpp, pe/ui/launcher.cpp
 msgid "Version {0} is on homebrew.page"
 msgstr "버전 {0}이(가) homebrew.page에 있습니다"
 
@@ -2138,10 +2135,6 @@ msgid "Vibration"
 msgstr "진동"
 
 #: pe/ui/settings.cpp
-msgid "VIBRATION"
-msgstr "진동"
-
-#: pe/ui/settings.cpp
 msgid "Vibration off"
 msgstr "진동 끔"
 
@@ -2150,15 +2143,15 @@ msgid "Vibration on"
 msgstr "진동 켬"
 
 #: pe/ui/settings.cpp
+msgid "Vibration strength"
+msgstr "진동 세기"
+
+#: pe/ui/settings.cpp
 msgid "Vibration, button mapping and the shortcuts during a game."
 msgstr "진동, 버튼 배치, 게임 중 바로 가기."
 
-#: pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/settings.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "Video"
-msgstr "비디오"
-
-#: pe/ui/settings.cpp
-msgid "VIDEO"
 msgstr "비디오"
 
 #: pe/ui/home.cpp
@@ -2182,6 +2175,14 @@ msgstr "{0} 대기 중"
 msgid "Waiting to download"
 msgstr "다운로드 대기 중"
 
+#: pe/ui/settings.cpp
+msgid "Wallpaper"
+msgstr "배경화면"
+
+#: pe/ui/settings.cpp
+msgid "What the FPS overlay's line says, and how the chip is drawn."
+msgstr "FPS 표시 줄에 보일 내용과 모양을 정합니다."
+
 #. Button on the update dialog: opens the new release's notes (what changes in it). Keep it short.
 #: pe/ui/update.cpp
 msgid "What's new"
@@ -2191,6 +2192,10 @@ msgstr "새로운 기능"
 #: pe/ui/update.cpp
 msgid "What's new in version {0}"
 msgstr "버전 {0}의 새로운 기능"
+
+#: pe/ui/game_options.cpp
+msgid "Which face button does what in the menu."
+msgstr "메뉴에서 어떤 버튼이 무엇을 하는지."
 
 #: pe/ui/settings.cpp
 msgid "Who is playing. Each profile keeps its own save data and settings."
@@ -2219,10 +2224,6 @@ msgstr "다음에 다시 묻습니다."
 #: pe/ui/save_sync.cpp
 msgid "You are told again at the next sync."
 msgstr "다음 동기화 때 다시 알려 드립니다."
-
-#: pe/ui/library.cpp
-msgid "Your games"
-msgstr "내 게임"
 
 #. Update dialog: installing the new app version keeps the player's files.
 #: pe/ui/update.cpp
@@ -2263,7 +2264,7 @@ msgid "{0} game lists could not be read."
 msgstr "게임 목록 {0}개를 읽을 수 없습니다."
 
 #. Any number of games other than one (also 0). See '{0} game'.
-#: pe/ui/browse.cpp, pe/ui/remote.cpp, pe/ui/settings.cpp
+#: pe/ui/browse.cpp, pe/ui/library.cpp, pe/ui/remote.cpp
 msgid "{0} games"
 msgstr "게임 {0}개"
 
@@ -2313,7 +2314,7 @@ msgid "{0} of {1} mods on"
 msgstr "모드 {1}개 중 {0}개 켜짐"
 
 #. How many of a game's mods are switched on: 2 of 3 on.
-#: pe/ui/library.cpp
+#: pe/ui/library.cpp, pe/ui/settings.cpp
 msgid "{0} of {1} on"
 msgstr "{1}개 중 {0}개 켜짐"
 
@@ -2338,7 +2339,7 @@ msgid "{0} · Profile {1}"
 msgstr "{0} · 프로필 {1}"
 
 #. A percentage (a volume): write it as the language does, for example with a space before the sign.
-#: pe/ui/game_options.cpp, pe/ui/remote.cpp, pe/ui/settings.cpp, pe/ui/update.cpp
+#: pe/ui/game_options.cpp, pe/ui/library.cpp, pe/ui/remote.cpp, pe/ui/settings.cpp, pe/ui/update.cpp
 msgid "{0}%"
 msgstr "{0}%"
 
@@ -2351,3 +2352,7 @@ msgstr "{0}/(NSP 또는 XCI)"
 #: pe/ui/browse.cpp
 msgid "{0}/ (one folder per game ID)"
 msgstr "{0}/(타이틀 ID마다 폴더 하나)"
+
+#: pe/ui/settings.cpp
+msgid "Crash reports (FTP): {0}\nAttach crash-*.txt and its matching logs to your issue."
+msgstr "충돌 보고서 (FTP): {0}\n문제 보고에 crash-*.txt와 해당 로그를 첨부하세요."

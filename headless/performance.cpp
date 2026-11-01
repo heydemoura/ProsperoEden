@@ -10,6 +10,7 @@
 #include <set>
 #include <cerrno>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cpuid.h>
 #include <cstring>
@@ -24,6 +25,8 @@
 #include <vector>
 #include <latch>
 #include <time.h>
+#include <sys/resource.h>
+#include <sys/time.h>
 #ifdef EDEN_DEV_PROFILE
 #include <signal.h>
 #endif
@@ -148,6 +151,53 @@ void PcSignal(int, siginfo_t*, void* context) {
 }
 #endif
 #ifdef PS5_NATIVE
+// Whether logical CPUs 0 and 1 are one physical core, by timing. Four multiply chains on each of
+// two CPUs at once: siblings take the core's one multiplier in turns and need about twice as long
+// as two CPUs of different cores. The shortest of three runs of each pair, for whatever else runs
+// meanwhile. (CheckWorkerTopology asks this where CPUID does not tell the cores apart.)
+long long PairLoopNs(unsigned cpu_a, unsigned cpu_b) {
+    std::atomic<int> ready{0};
+    std::atomic<bool> go{false};
+    std::array<long long, 2> elapsed{-1, -1};
+    const auto body = [&](unsigned cpu, unsigned slot) {
+        cpuset_t one{};
+        CPU_SET(cpu, &one);
+        const bool placed = cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, 8, &one) == 0;
+        sched_yield();
+        ready.fetch_add(1, std::memory_order_release);
+        if (!placed) return;
+        // Bounded: threads of one priority are not time-sliced here.
+        for (unsigned spins = 0; !go.load(std::memory_order_acquire) && spins < 200'000'000; ++spins) {}
+        const long long begin = NowNs();
+        unsigned long long a = cpu + 1, b = 3, c = 5, d = 7;
+        for (unsigned i = 0; i < 1'500'000; ++i) {
+            a = a * 6364136223846793005ULL + 1;
+            b = b * 2862933555777941757ULL + 3;
+            c = c * 3202034522624059733ULL + 5;
+            d = d * 1442695040888963407ULL + 7;
+        }
+        volatile unsigned long long sink = a ^ b ^ c ^ d;
+        (void)sink;
+        elapsed[slot] = NowNs() - begin;
+    };
+    std::thread first(body, cpu_a, 0u), second(body, cpu_b, 1u);
+    while (ready.load(std::memory_order_acquire) < 2) std::this_thread::yield();
+    go.store(true, std::memory_order_release);
+    first.join();
+    second.join();
+    return elapsed[0] < 0 || elapsed[1] < 0 ? -1 : std::max(elapsed[0], elapsed[1]);
+}
+bool AdjacentCpusShareCore() {
+    long long together = -1, apart = -1;
+    for (int run = 0; run < 3; ++run) {
+        const long long pair = PairLoopNs(0, 1), others = PairLoopNs(0, 2);
+        if (pair > 0 && (together < 0 || pair < together)) together = pair;
+        if (others > 0 && (apart < 0 || others < apart)) apart = others;
+    }
+    const bool share = together > 0 && apart > 0 && together * 4 >= apart * 5;
+    std::printf("EDEN_WORKER_SMT cpus_0_1_ns=%lld cpus_0_2_ns=%lld share=%d\n", together, apart, share);
+    return share;
+}
 std::array<unsigned, 5> worker_cpus{};
 bool worker_topology_ready = false;
 // Physical core (x2APIC above the SMT shift) of each allowed CPU, -1 if unknown.
@@ -160,17 +210,27 @@ bool topology_allowed_valid = false;
 std::atomic<bool> placement_secondary{false};
 std::atomic<unsigned> secondary_reports{};
 void CheckWorkerTopology() {
+    // Probe once per process. Later games start from a launcher thread that the first game's
+    // placement left on the secondary CPUs, where the probe finds too few cores.
+    if (worker_topology_ready) {
+        std::printf("EDEN_WORKER_TOPOLOGY ready=1 cached=1 cpus=%u,%u,%u,%u,%u\n",
+            worker_cpus[0], worker_cpus[1], worker_cpus[2], worker_cpus[3], worker_cpus[4]);
+        return;
+    }
     cpuset_t original{};
     if (__get_cpuid_max(0, nullptr) < 0xb ||
         cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, 8, &original)) return;
     std::array<unsigned, 5> cores{};
     unsigned count = 0;
-    bool changed = false;
+    bool changed = false, refused = false, measured = false;
     for (unsigned cpu = 0; cpu < 64; ++cpu) {
         if (!CPU_ISSET(cpu, &original)) continue;
         cpuset_t one{};
         CPU_SET(cpu, &one);
-        if (cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, 8, &one)) break;
+        if (cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, 8, &one)) {
+            refused = true;
+            break;
+        }
         changed = true;
         unsigned a, b, c, d;
         __cpuid_count(0xb, 0, a, b, c, d);
@@ -191,6 +251,28 @@ void CheckWorkerTopology() {
             std::memcmp(&original, &restored, 8))
             throw std::runtime_error("Cannot restore topology-probe thread affinity");
     }
+    // CPUID did not tell five physical cores apart: newer system software gives one answer for
+    // every CPU (a console with it ran every thread unpinned: a large open-world game at 20
+    // frames a second where a console with pinned threads made 26 to 29). Where CPUID does
+    // answer, logical CPUs 2n and 2n+1 are one core; a timing of two pairs says whether that
+    // holds here (AdjacentCpusShareCore), and then the same five CPUs are used.
+    if (!refused && count != cores.size()) {
+        unsigned even = 0;
+        for (unsigned cpu = 0; cpu < 64; cpu += 2) even += CPU_ISSET(cpu, &original) ? 1 : 0;
+        if (even >= cores.size() && CPU_ISSET(1, &original) && AdjacentCpusShareCore()) {
+            count = 0;
+            cpu_core.fill(-1);
+            for (unsigned cpu = 0; cpu < 64; ++cpu) {
+                if (!CPU_ISSET(cpu, &original)) continue;
+                cpu_core[cpu] = static_cast<int>(cpu / 2);
+                if ((cpu & 1) == 0 && count < cores.size()) {
+                    cores[count] = cpu / 2;
+                    worker_cpus[count++] = cpu;
+                }
+            }
+            measured = true;
+        }
+    }
     worker_topology_ready = count == cores.size();
     topology_allowed = original;
     topology_allowed_valid = true;
@@ -203,8 +285,9 @@ void CheckWorkerTopology() {
         }
         std::printf("EDEN_WORKER_SECONDARY mask=%llx\n", secondary_cpus);
     }
-    std::printf("EDEN_WORKER_TOPOLOGY ready=%d distinct_cores=%u cpus=%u,%u,%u,%u,%u\n",
-        worker_topology_ready, count, worker_cpus[0], worker_cpus[1], worker_cpus[2], worker_cpus[3], worker_cpus[4]);
+    std::printf("EDEN_WORKER_TOPOLOGY ready=%d distinct_cores=%u cpus=%u,%u,%u,%u,%u measured=%d\n",
+        worker_topology_ready, count, worker_cpus[0], worker_cpus[1], worker_cpus[2], worker_cpus[3], worker_cpus[4],
+        static_cast<int>(measured));
 }
 void PlaceSecondary(const char* name) {
     if (!placement_secondary.load(std::memory_order_relaxed) || !secondary_cpus) return;
@@ -235,6 +318,11 @@ void PinWorker(unsigned index, cpuset_t& affinity) {
 }
 #endif
 bool cpu_clocks_valid = false;
+// getrusage(RUSAGE_SELF) counted a spinning thread and stayed still through a sleep, so the
+// overlay's CPU share may be read from it. The console's CLOCK_PROCESS_CPUTIME_ID may not: it
+// counts the wall clock (CheckCpuClocks), which would pin that share at 1.0 and the percentage
+// at round(100 / hardware_concurrency()) for ever.
+std::atomic<bool> process_usage_valid{false};
 bool owner_cpu_clock_valid = false;
 std::atomic<unsigned> sample_epoch{};
 struct CpuSample {
@@ -263,6 +351,15 @@ long long ClockNs(clockid_t clock) {
     if (clock_gettime(clock, &time) != 0) return -errno;
     return static_cast<long long>(time.tv_sec) * 1'000'000'000 + time.tv_nsec;
 }
+// This process's CPU time as the kernel accounts it, in nanoseconds, or -1.
+long long ProcessUsageNs() {
+    rusage usage{};
+    if (getrusage(RUSAGE_SELF, &usage) != 0) return -1;
+    const auto us = [](const timeval& time) {
+        return static_cast<long long>(time.tv_sec) * 1'000'000 + time.tv_usec;
+    };
+    return (us(usage.ru_utime) + us(usage.ru_stime)) * 1000;
+}
 void CheckCpuClocks() {
     clockid_t worker_clock{};
     int worker_error = ENOENT;
@@ -283,13 +380,16 @@ void CheckCpuClocks() {
     });
     ready.acquire();
     const auto cpu_begin = worker_error ? -1 : ClockNs(worker_clock);
+    const auto usage_begin = ProcessUsageNs();
     proceed.release();
     ready.acquire();
-    const auto cpu_busy = worker_error ? -1 : ClockNs(worker_clock);
+    const auto cpu_busy = ClockNs(worker_clock);
     const auto process_idle = process_error ? -1 : ClockNs(process_clock);
+    const auto usage_mid = ProcessUsageNs();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
-    const auto cpu_idle = worker_error ? -1 : ClockNs(worker_clock);
+    const auto cpu_idle = ClockNs(worker_clock);
     const auto process_end = process_error ? -1 : ClockNs(process_clock);
+    const auto usage_end = ProcessUsageNs();
     proceed.release();
     worker.join();
     const auto own_busy = owner_busy - owner_begin;
@@ -308,6 +408,18 @@ void CheckCpuClocks() {
                 "worker_clock=%d process_clock=%d busy_ns=%lld idle_ns=%lld process_sleep_ns=%lld\n",
                 cpu_clocks_valid, worker_error, process_error, int(worker_clock), int(process_clock),
                 busy, idle, process_sleep);
+    // getrusage has to do both halves: charge most of the twenty milliseconds the probe worker
+    // spun (a reading that never moves would leave the overlay's share at 0) and hold still
+    // through the twenty that follow, where this thread sleeps and the worker is blocked (a
+    // reading of the wall clock would not). A core has not been constructed yet, so the second
+    // window has almost nothing else to charge.
+    const long long usage_busy = usage_mid - usage_begin;
+    const long long usage_sleep = usage_end - usage_mid;
+    process_usage_valid.store(usage_begin >= 0 && usage_mid >= usage_begin &&
+        usage_end >= usage_mid && usage_busy >= 5'000'000 && usage_sleep < 10'000'000,
+        std::memory_order_relaxed);
+    std::printf("EDEN_PERF_PROCESS_USAGE_CHECK valid=%d busy_ns=%lld sleep_ns=%lld\n",
+                process_usage_valid.load(std::memory_order_relaxed), usage_busy, usage_sleep);
 }
 }
 
@@ -381,6 +493,184 @@ static unsigned long long GraphicsMemoryFree() {
 #endif
 
 namespace {
+// How much of the time since the last reading a counter has taken, against the wall clock. Read
+// every frame but worked out only every quarter of a second: two clock reads then cost nothing,
+// and one slow frame does not swing the number. Until a full quarter has gone by there is no
+// reading, and this returns -1.
+struct Rate {
+    long long wall = 0;
+    long long work = 0;
+    double shown = -1.0;
+};
+double SampleRate(Rate& state, long long work, long long wall) {
+    if (wall <= 0) return -1.0;
+    if (state.wall == 0) {
+        state.wall = wall;
+        state.work = work;
+        return -1.0;
+    }
+    const long long wall_step = wall - state.wall;
+    if (wall_step < 250'000'000) return state.shown;
+    const long long work_step = work - state.work;
+    state.wall = wall;
+    state.work = work;
+    state.shown = wall_step > 0 ? static_cast<double>(work_step) / static_cast<double>(wall_step) : -1.0;
+    return state.shown;
+}
+long long MonotonicNs() {
+    timespec time{};
+    if (clock_gettime(CLOCK_MONOTONIC, &time) != 0) return 0;
+    return static_cast<long long>(time.tv_sec) * 1'000'000'000 + time.tv_nsec;
+}
+// A fraction as a whole percentage, 0 to 100.
+unsigned Percent(double share) {
+    if (share <= 0.0) return 0;
+    if (share >= 1.0) return 100;
+    return static_cast<unsigned>(share * 100.0 + 0.5);
+}
+} // namespace
+
+unsigned HostCpuPercent() {
+    // The process's own CPU time against the wall clock, as a share of every core there is: what
+    // a single core would say is 100% as soon as one core is busy, which says nothing. Read from
+    // getrusage, which CheckCpuClocks qualified against both failure modes; the console's own
+    // process clock reads the wall clock and would hold this share at 1.0 (and so the displayed
+    // percentage at round(100 / hardware_concurrency())) for the whole run. Nothing usable to
+    // read is an overlay "--", never a number that only looks like one.
+    static thread_local Rate state;
+    static const unsigned cores = std::max(1u, std::thread::hardware_concurrency());
+    static std::atomic<bool> reported{false};
+    const auto note = [&](const char* detail) {
+        if (!reported.exchange(true, std::memory_order_relaxed))
+            std::printf("EDEN_PERF_HOST_CPU cores=%u %s\n", cores, detail);
+    };
+    if (!process_usage_valid.load(std::memory_order_relaxed)) {
+        note("source=none");
+        return ~0u;
+    }
+    const long long work = ProcessUsageNs();
+    if (work < 0) {
+        const int error = errno;
+        process_usage_valid.store(false, std::memory_order_relaxed);
+        char detail[64]{};
+        std::snprintf(detail, sizeof(detail), "source=none error=%d", error);
+        note(detail);
+        return ~0u;
+    }
+    const double share = SampleRate(state, work, MonotonicNs());
+    if (share < 0.0) return ~0u;
+    char detail[64]{};
+    std::snprintf(detail, sizeof(detail), "source=getrusage share=%.4f", share);
+    note(detail);
+    return Percent(share / static_cast<double>(cores));
+}
+
+void GuestCoreLoads(unsigned loads[4]) {
+    // A thread's CPU time can only be read by the thread itself on the console, so each core
+    // writes its own when it next leaves the guest's code after being asked (SampleCpu); here
+    // the last two readings of a core are set against the time between them. A core that wrote
+    // nothing since the last look was asleep, which is no load; when it wakes, its next reading
+    // covers the whole stretch.
+    struct Core {
+        long long mono = 0, cpu = 0;
+        unsigned shown = ~0u;
+    };
+    static thread_local Core cores[4];
+    static thread_local long long asked = 0;
+    const long long now = MonotonicNs();
+    if (now != 0 && (asked == 0 || now - asked >= 250'000'000)) {
+        asked = now;
+        std::array<CpuSample, 4> samples;
+        {
+            std::lock_guard lock(workers_mutex);
+            samples = cpu_samples;
+        }
+        for (unsigned i = 0; i < 4; ++i) {
+            const CpuSample& sample = samples[i];
+            Core& core = cores[i];
+            if (sample.epoch == ~0u || sample.cpu_ns < 0) {
+                core = {};
+            } else if (core.mono == 0) {
+                core.mono = sample.mono_ns;
+                core.cpu = sample.cpu_ns;
+            } else if (sample.mono_ns > core.mono) {
+                core.shown = Percent(static_cast<double>(sample.cpu_ns - core.cpu) /
+                                     static_cast<double>(sample.mono_ns - core.mono));
+                core.mono = sample.mono_ns;
+                core.cpu = sample.cpu_ns;
+            } else if (core.shown != ~0u) {
+                core.shown = 0;
+            }
+        }
+        sample_epoch.fetch_add(1, std::memory_order_relaxed);  // the next readings, please
+    }
+    for (unsigned i = 0; i < 4; ++i) loads[i] = cores[i].shown;
+}
+
+unsigned GpuBusyPercent() {
+    // The GPU's own time against the wall clock: the Vulkan scheduler stamps the start and the end
+    // of every command buffer on the GPU, and what lies between them is time the GPU spent on the
+    // game's pictures. Gaps inside one command buffer count as busy, so the share can read a
+    // little high, never low. Without timestamps (the OpenGL renderer, a driver that refuses
+    // them, or before the first results) there is nothing to show: "--".
+    static thread_local Rate state;
+    if (gpu_time_failed.load(std::memory_order_relaxed) ||
+        gpu_time_results.load(std::memory_order_relaxed) == 0)
+        return ~0u;
+    const double share = SampleRate(
+        state, static_cast<long long>(gpu_time_busy_ns.load(std::memory_order_relaxed)), MonotonicNs());
+    if (share < 0.0) return ~0u;
+    return Percent(share);
+}
+
+void MemoryPool(unsigned long long* free_bytes, unsigned long long* total_bytes) {
+    // The pool the guest, the JIT and the graphics driver all draw on: direct memory on the
+    // console, where each of them has to fit, and the machine's own RAM in a PC build, where
+    // that is the closest thing. Looked at once a second.
+    static long long checked = 0;
+    static unsigned long long free_pool = 0, total_pool = 0;
+    const long long now = MonotonicNs();
+    if (checked != 0 && now - checked < 1'000'000'000) {
+        *free_bytes = free_pool;
+        *total_bytes = total_pool;
+        return;
+    }
+    checked = now;
+#ifdef PS5_NATIVE
+    const std::int64_t total = sceKernelGetDirectMemorySize();
+    std::int64_t taken = 0, offset = 0;
+    DirectMemoryRegion region{};
+    unsigned regions = 0;
+    while (total > 0 && offset < total && regions < 8192 &&
+           sceKernelDirectMemoryQuery(offset, 1, &region, sizeof(region)) == 0 && region.end > offset) {
+        taken += region.end - region.start;
+        offset = region.end;
+        ++regions;
+    }
+    // No region at all means the walk could not be read, not that nothing is taken.
+    total_pool = regions != 0 ? static_cast<unsigned long long>(total) : 0;
+    free_pool = regions != 0 ? static_cast<unsigned long long>(total - taken) : 0;
+#else
+    std::FILE* meminfo = std::fopen("/proc/meminfo", "r");
+    unsigned long long total = 0, available = 0;
+    if (meminfo != nullptr) {
+        char line[128];
+        while (std::fgets(line, sizeof(line), meminfo) != nullptr) {
+            if (std::strncmp(line, "MemTotal:", 9) == 0)
+                total = std::strtoull(line + 9, nullptr, 10) * 1024;
+            else if (std::strncmp(line, "MemAvailable:", 13) == 0)
+                available = std::strtoull(line + 13, nullptr, 10) * 1024;
+        }
+        std::fclose(meminfo);
+    }
+    total_pool = total;
+    free_pool = total != 0 ? available : 0;
+#endif
+    *free_bytes = free_pool;
+    *total_bytes = total_pool;
+}
+
+namespace {
 std::mutex hle_mutex;
 // Keyed by the service's name pointer (one per service object) and command id.
 std::map<std::pair<const char*, unsigned>, std::pair<unsigned long long, unsigned long long>> hle_calls;
@@ -391,6 +681,36 @@ void RecordHle(const char* service, unsigned command, long long ns) {
     auto& entry = hle_calls[{service, command}];
     ++entry.first;
     entry.second += static_cast<unsigned long long>(ns > 0 ? ns : 0);
+}
+
+void ReportSessionMemory(const char* phase, unsigned session) {
+    unsigned large_blocks = 0;
+    const std::size_t large = eden_heap_large_held ? eden_heap_large_held(&large_blocks) : 0;
+    std::size_t table_span = 0, table_held = 0;
+    ::Common::SparseUsage(&table_span, &table_held);
+    long long total = 0, free_bytes = -1;
+    std::size_t largest = 0;
+    unsigned regions = 0;
+#ifdef PS5_NATIVE
+    total = sceKernelGetDirectMemorySize();
+    if (total > 0) {
+        std::int64_t start = 0, taken = 0, offset = 0;
+        (void)sceKernelAvailableDirectMemorySize(0, total, 0x4000, &start, &largest);
+        DirectMemoryRegion region{};
+        while (offset < total && regions < 8192 &&
+               sceKernelDirectMemoryQuery(offset, 1, &region, sizeof(region)) == 0 && region.end > offset) {
+            taken += region.end - region.start;
+            offset = region.end;
+            ++regions;
+        }
+        if (regions != 0) free_bytes = total - taken;
+    }
+#endif
+    std::printf("EDEN_SESSION_MEMORY phase=%s session=%u total=%lld free=%lld largest_free=%zu regions=%u "
+                "heap_pieces=%zu heap_large=%zu large_blocks=%u tables=%zu\n",
+                phase, session, total, free_bytes, largest, regions,
+                eden_heap_committed ? eden_heap_committed() : std::size_t{0}, large, large_blocks, table_held);
+    std::fflush(stdout);
 }
 
 void ReportGpuThread(unsigned frame) {
@@ -447,12 +767,14 @@ void ReportGpuThread(unsigned frame) {
     // Cumulative totals; the analyzer takes deltas between consecutive reports.
     std::printf("EDEN_DEV_GPU frame=%u mono_ns=%lld cpu_ns=%lld idle_ns=%llu dispatch_calls=%llu "
                 "dispatch_ns=%llu drain_calls=%llu drain_ns=%llu present_calls=%llu present_ns=%llu "
-                "full_calls=%llu full_ns=%llu draws=%llu\n", frame, ClockNs(CLOCK_MONOTONIC),
+                "full_calls=%llu full_ns=%llu draws=%llu dma_runs=%llu dma_run_words=%llu dma_words=%llu\n", frame, ClockNs(CLOCK_MONOTONIC),
                 owner_cpu_clock_valid ? ClockNs(CLOCK_THREAD_CPUTIME_ID) : -static_cast<long long>(ENOTSUP),
                 load(gpu_queue_wait, false), load(gpu_dispatch, true), load(gpu_dispatch, false),
                 load(gpu_fence_drain, true), load(gpu_fence_drain, false),
                 load(gpu_present_wait, true), load(gpu_present_wait, false),
-                load(gpu_queue_full, true), load(gpu_queue_full, false), load(rasterizer_draw, true));
+                load(gpu_queue_full, true), load(gpu_queue_full, false), load(rasterizer_draw, true),
+                dma_batch_runs.load(std::memory_order_relaxed), dma_batch_words.load(std::memory_order_relaxed),
+                dma_single_words.load(std::memory_order_relaxed));
     // What the dispatch is made of: the draw path itself (RasterizerVulkan::PrepareDraw - both
     // cache locks, pipeline configure, dynamic state, the record) against the guest method
     // decoding that surrounds it, plus the dispatch's own three phases. A draw whose
@@ -546,6 +868,13 @@ void ReportGpuThread(unsigned frame) {
                 load(guest_sync_wait, true), load(guest_sync_wait, false),
                 load(guest_dequeue_wait, true), load(guest_dequeue_wait, false));
     std::printf(" ipc_calls=%llu ipc_ns=%llu", load(guest_ipc_wait, true), load(guest_ipc_wait, false));
+    std::printf(" write_deferred=%llu dirty_replays=%llu read_skipped=%llu",
+                cpu_write_deferred.load(std::memory_order_relaxed), gpu_dirty_replays.load(std::memory_order_relaxed),
+                cpu_read_skipped.load(std::memory_order_relaxed));
+    std::printf(" tex_partial=%llu tex_partial_bytes=%llu tex_partial_checks=%llu tex_partial_mismatches=%llu",
+                tex_partial_uploads.load(std::memory_order_relaxed), tex_partial_bytes.load(std::memory_order_relaxed),
+                tex_partial_checks.load(std::memory_order_relaxed),
+                tex_partial_mismatches.load(std::memory_order_relaxed));
     std::printf(" cache_lock_contended=%llu cache_lock_blocked=%llu",
                 cache_lock_contended.load(std::memory_order_relaxed), cache_lock_blocked.load(std::memory_order_relaxed));
     std::printf(" fs_file_calls=%llu fs_file_ns=%llu fs_file_bytes=%llu fs_storage_calls=%llu fs_storage_ns=%llu "
@@ -618,18 +947,42 @@ void ReportGpuThread(unsigned frame) {
                 ipc_hist[0].load(std::memory_order_relaxed), ipc_hist[1].load(std::memory_order_relaxed),
                 ipc_hist[2].load(std::memory_order_relaxed), ipc_hist[3].load(std::memory_order_relaxed),
                 load(ipc_thread_overflow, true), load(ipc_thread_overflow, false));
+    if (cpu_write_detail.load(std::memory_order_relaxed)) {
+        // Cumulative per guest core (3 = other threads); performance.h CpuWriteDetail.
+        std::printf("EDEN_DEV_CPUWRITE hold_calls=%llu hold_ns=%llu hold_max_ns=%llu hold_long=%llu",
+                    load(draw_cache_hold, true), load(draw_cache_hold, false),
+                    draw_cache_hold_max.exchange(0, std::memory_order_relaxed),
+                    draw_cache_hold_long.load(std::memory_order_relaxed));
+        for (unsigned core = 0; core < cpu_write_stats.size(); ++core) {
+            const auto& stats = cpu_write_stats[core];
+            const auto get = [](const std::atomic<unsigned long long>& value) {
+                return value.load(std::memory_order_relaxed);
+            };
+            std::printf(" c%u=%llu/%llu/%llu/%llu/%llu sizes%u=%llu/%llu/%llu/%llu out%u=%llu/%llu/%llu"
+                        " ns%u=%llu/%llu/%llu/%llu/%llu ahead%u=%llu/%llu",
+                        core, get(stats.tracked), get(stats.tracked_ns), get(stats.passed), get(stats.same_page),
+                        get(stats.still_tracked), core, get(stats.sizes[0]), get(stats.sizes[1]),
+                        get(stats.sizes[2]), get(stats.sizes[3]), core, get(stats.unregistered),
+                        get(stats.gpu_modified), get(stats.cpu_modified), core, get(stats.buffer_wait_ns),
+                        get(stats.buffer_ns), get(stats.texture_wait_ns), get(stats.texture_ns),
+                        get(stats.shader_ns), core, get(stats.next_page), get(stats.ahead_pages));
+        }
+        std::printf("\n");
+    }
     const auto window = Eden::Fastmem::WindowStats();
     std::printf("EDEN_FASTMEM window=%llx pages=%llu chunks=%llu direct_reads=%llu direct_writes=%llu "
-                "faults=%llu maps=%llu unmaps=%llu protects=%llu kernel_calls=%llu kernel_ns=%llu failures=%llu\n",
+                "faults=%llu demotions=%llu maps=%llu unmaps=%llu protects=%llu kernel_calls=%llu kernel_ns=%llu failures=%llu large=%llu\n",
                 static_cast<unsigned long long>(window.window), static_cast<unsigned long long>(window.mapped_pages),
                 static_cast<unsigned long long>(window.aliased_chunks),
                 static_cast<unsigned long long>(window.direct_reads),
                 static_cast<unsigned long long>(window.direct_writes),
                 static_cast<unsigned long long>(Eden::Fastmem::Faults()),
+                static_cast<unsigned long long>(Eden::Fastmem::Demotions()),
                 static_cast<unsigned long long>(window.map_calls), static_cast<unsigned long long>(window.unmap_calls),
                 static_cast<unsigned long long>(window.protect_calls),
                 static_cast<unsigned long long>(window.kernel_calls), static_cast<unsigned long long>(window.kernel_ns),
-                static_cast<unsigned long long>(window.failures));
+                static_cast<unsigned long long>(window.failures),
+                static_cast<unsigned long long>(window.large_blocks));
     // Guest cores record their owner CPU clocks at their next JIT exit.
     Snapshot();
 }
@@ -697,6 +1050,19 @@ void RegisterWorker(const char* name) {
 #ifdef PS5_NATIVE
     PlaceSecondary(name);
 #endif
+}
+
+void SampleCoreCpu(unsigned core) {
+    if (core >= cpu_samples.size()) return;
+    const auto epoch = sample_epoch.load(std::memory_order_relaxed);
+    if (sampled_epoch[core] == epoch) return;
+    sampled_epoch[core] = epoch;
+    CpuSample sample;
+    sample.epoch = epoch;
+    sample.mono_ns = ClockNs(CLOCK_MONOTONIC);
+    sample.cpu_ns = owner_cpu_clock_valid ? ClockNs(CLOCK_THREAD_CPUTIME_ID) : -ENOTSUP;
+    std::lock_guard lock(workers_mutex);
+    cpu_samples[core] = sample;
 }
 
 void SampleCpu(unsigned core, unsigned long long thread, unsigned long long pc, unsigned svc, unsigned fpcr) {
